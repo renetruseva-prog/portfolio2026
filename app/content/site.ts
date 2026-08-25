@@ -19,12 +19,14 @@ export const site = {
 
 export const heroAssets = {
   photo: "/images/portfolio/hero-photo.png",
+  hand: "/images/portfolio/hero-hand.png",
   circle: "/images/portfolio/hero-ellipse.svg",
-  laptop: "/images/portfolio/collage-laptop.png",
-  coffee: "/images/portfolio/collage-coffee.png",
-  wrench: "/images/portfolio/collage-wrench.png",
-  folder: "/images/portfolio/collage-folder.png",
-  scrunchie: "/images/portfolio/collage-donut.png",
-  star: "/images/portfolio/collage-star-small.png",
+  laptop: "/images/portfolio/laptop.png",
+  icedCoffee: "/images/portfolio/icedCoffee.png",
+  tool: "/images/portfolio/tool.png",
+  sketchbook: "/images/portfolio/sketchbook.png",
+  scrunchieAndHairpin: "/images/portfolio/scrunchieAndHairpin.png",
+  headerArrow: "/images/portfolio/header_arrow.svg",
+  star: "/images/portfolio/star.svg",
   ctaArrow: "/images/portfolio/arrow.svg",
 } as const;

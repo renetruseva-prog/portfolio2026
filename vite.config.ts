@@ -26,7 +26,6 @@ export default defineConfig({
   server: {
     host: true,
     port,
-    origin: `http://${localIp}:${port}`,
     hmr: {
       host: localIp,
       port,
