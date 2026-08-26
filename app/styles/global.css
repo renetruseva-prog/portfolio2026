@@ -86,7 +86,7 @@ button {
 @media (min-width: 48rem) {
   html,
   body {
-    overflow-y: hidden;
+    overflow-y: auto;
   }
 }
 

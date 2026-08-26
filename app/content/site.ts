@@ -30,3 +30,45 @@ export const heroAssets = {
   star: "/images/portfolio/star.svg",
   ctaArrow: "/images/portfolio/arrow.svg",
 } as const;
+
+export type WorkProject = {
+  id: string;
+  title: readonly [string, string];
+  tags: readonly string[];
+  href: string;
+  ctaLabel: string;
+};
+
+export const worksAssets = {
+  circle: "/images/portfolio/hero-ellipse.svg",
+  figure: "/images/portfolio/project-figure.png",
+  balloonBlue: "/images/portfolio/balloon-blue.png",
+  balloonPink: "/images/portfolio/balloon-pink.png",
+  arrowLeft: "/images/portfolio/arrow-left.svg",
+  arrowRight: "/images/portfolio/arrow-right.svg",
+  squiggle: "/images/portfolio/squiggle-works.svg",
+} as const;
+
+export const worksProjects: WorkProject[] = [
+  {
+    id: "beauty-of-transgression",
+    title: ["The beauty", "of transgression"],
+    tags: ["Creative Code", "Design", "UI/UX"],
+    href: "#",
+    ctaLabel: "See more",
+  },
+  {
+    id: "digital-canvas",
+    title: ["Digital", "canvas"],
+    tags: ["Creative Code", "Motion", "Web"],
+    href: "#",
+    ctaLabel: "See more",
+  },
+  {
+    id: "form-and-feeling",
+    title: ["Form and", "feeling"],
+    tags: ["Design", "UI/UX", "Branding"],
+    href: "#",
+    ctaLabel: "See more",
+  },
+];
