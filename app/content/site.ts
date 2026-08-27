@@ -42,7 +42,7 @@ export type WorkProject = {
 export const worksSlideCircleColors = [
   "#D00E0E",
   "#33E5A2",
-  "#D00E0E",
+  "#1E50E1",
   "#D00E0E",
 ] as const;
 
@@ -57,6 +57,13 @@ export const worksAssets = {
     phone: "/images/portfolio/works-memome/slide2/memo-phone.png",
     greenGrid: "/images/portfolio/works-memome/slide2/green-grid.svg",
     hand: "/images/portfolio/works-memome/slide2/hand.svg",
+  },
+  slide3: {
+    phone: "/images/portfolio/works-memome/slide3/phone_webrtc.png",
+    hand: "/images/portfolio/works-memome/slide3/hand_webrtc.png",
+    sparkleLeft: "/images/portfolio/works-memome/slide3/left_sparkle.png",
+    sparkleRight: "/images/portfolio/works-memome/slide3/right_sparkle.png",
+    sparkleBottom: "/images/portfolio/works-memome/slide3/sparkle_bottom.png",
   },
   arrowLeft: "/images/portfolio/arrow-left.svg",
   arrowRight: "/images/portfolio/arrow-right.svg",
@@ -78,9 +85,9 @@ export const worksProjects: WorkProject[] = [
     ctaLabel: "See more",
   },
   {
-    id: "form-and-feeling",
-    title: "Form and feeling",
-    tags: ["Design", "UI/UX", "Branding"],
+    id: "webrtc-presenter",
+    title: "Phone to desktop presenter with WebRTC",
+    tags: ["Creative Code", "WebRTC", "Socket.IO"],
     href: "#",
     ctaLabel: "See more",
   },
