@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { worksAssets, worksProjects } from "~/content/site";
 import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
 import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
+import { initWorksMemomeIntro } from "~/lib/works-memome.client";
 import "./works-section.css";
 
 const SLIDE_COUNT = worksProjects.length;
@@ -23,12 +24,20 @@ export function WorksSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
+  const memomeRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const visual = visualRef.current;
     if (!section || !visual) return;
     return initWorksBalloonIntro(section, visual);
+  }, []);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const memome = memomeRef.current;
+    if (!section || !memome) return;
+    return initWorksMemomeIntro(section, memome);
   }, []);
 
   useEffect(() => {
@@ -76,6 +85,7 @@ export function WorksSection() {
                 alt=""
                 width={83}
                 height={37}
+                draggable={false}
               />
             </label>
           ))}
@@ -83,63 +93,99 @@ export function WorksSection() {
           <div ref={viewportRef} className="works__card-viewport">
             <div className="works__drag-surface">
               <div className="works__stage">
-                <div ref={visualRef} className="works__visual">
-                  <img
-                    className="works__circle"
-                    src={worksAssets.circle}
-                    alt=""
-                    width={274}
-                    height={274}
-                    draggable={false}
-                  />
-                  <div className="works__figure-layer works__figure-layer--clipped">
-                    <div className="works__figure-box">
+                <div className="works__visual-track">
+                  <div className="works__circle-bg" aria-hidden="true" />
+                  <div
+                    ref={visualRef}
+                    className="works__visual works__visual-panel works__visual-panel--0"
+                  >
+                    <div className="works__figure-layer works__figure-layer--clipped">
+                      <div className="works__figure-box">
+                        <img
+                          className="works__figure"
+                          src={worksAssets.slide1.figure}
+                          alt=""
+                          width={2000}
+                          height={2083}
+                          draggable={false}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="works__figure-layer works__figure-layer--top">
+                      <div className="works__figure-box">
+                        <img
+                          className="works__figure works__figure--cut"
+                          src={worksAssets.slide1.figureCut}
+                          alt=""
+                          width={467}
+                          height={684}
+                          draggable={false}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="works__balloons">
                       <img
-                        className="works__figure"
-                        src={worksAssets.figure}
+                        className="works__balloon works__balloon--left works__balloon--animate"
+                        src={worksAssets.slide1.balloonBlue}
                         alt=""
-                        width={2000}
-                        height={2083}
-                        draggable={false}
+                        width={945}
+                        height={1024}
+                      />
+                      <img
+                        className="works__balloon works__balloon--top works__balloon--animate works__balloon--delay-1"
+                        src={worksAssets.slide1.balloonPink}
+                        alt=""
+                        width={686}
+                        height={1024}
+                      />
+                      <img
+                        className="works__balloon works__balloon--right works__balloon--animate works__balloon--delay-2"
+                        src={worksAssets.slide1.balloonBlue}
+                        alt=""
+                        width={945}
+                        height={1024}
                       />
                     </div>
                   </div>
 
-                  <div className="works__figure-layer works__figure-layer--top">
-                    <div className="works__figure-box">
-                      <img
-                        className="works__figure works__figure--cut"
-                        src={worksAssets.figureCut}
-                        alt=""
-                        width={467}
-                        height={684}
-                        draggable={false}
-                      />
-                    </div>
-                  </div>
-                  <div className="works__balloons">
+                  <div
+                    ref={memomeRef}
+                    className="works__visual works__visual-panel works__visual-panel--1 works__visual-panel--memome"
+                  >
                     <img
-                      className="works__balloon works__balloon--left works__balloon--animate"
-                      src={worksAssets.balloonBlue}
-                      alt=""
-                      width={945}
-                      height={1024}
+                      className="works__memome-phone"
+                      src={worksAssets.slide2.phone}
+                      alt="Memome app map interface on a phone"
+                      width={533}
+                      height={931}
+                      draggable={false}
                     />
                     <img
-                      className="works__balloon works__balloon--top works__balloon--animate works__balloon--delay-1"
-                      src={worksAssets.balloonPink}
+                      className="works__memome-grid works__memome-grid--animate"
+                      src={worksAssets.slide2.greenGrid}
                       alt=""
-                      width={686}
-                      height={1024}
+                      width={95}
+                      height={117}
+                      draggable={false}
                     />
                     <img
-                      className="works__balloon works__balloon--right works__balloon--animate works__balloon--delay-2"
-                      src={worksAssets.balloonBlue}
+                      className="works__memome-hand works__memome-hand--animate"
+                      src={worksAssets.slide2.hand}
                       alt=""
-                      width={945}
-                      height={1024}
+                      width={70}
+                      height={87}
+                      draggable={false}
                     />
                   </div>
+
+                  {worksProjects.slice(2).map((project, offset) => (
+                    <div
+                      key={project.id}
+                      className={`works__visual works__visual-panel works__visual-panel--${offset + 2} works__visual-panel--placeholder`}
+                    />
+                  ))}
                 </div>
               </div>
 

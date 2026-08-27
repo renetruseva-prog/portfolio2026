@@ -1,13 +1,94 @@
 import type { gsap as GsapCore } from "gsap";
 import type DraggablePlugin from "gsap/Draggable";
 
+import { worksSlideCircleColors } from "~/content/site";
+
 type GsapInstance = typeof GsapCore;
 type DraggableInstance = typeof DraggablePlugin;
+
+type Rgb = { r: number; g: number; b: number };
 
 const DRAG_COMMIT_PX = 40;
 const initializedViewports = new WeakSet<HTMLElement>();
 
 let gsapInstance: GsapInstance | null = null;
+
+function parseHex(hex: string): Rgb {
+  const value = hex.replace("#", "");
+  const normalized =
+    value.length === 3 ? value.split("").map((channel) => channel + channel).join("") : value;
+
+  return {
+    r: Number.parseInt(normalized.slice(0, 2), 16),
+    g: Number.parseInt(normalized.slice(2, 4), 16),
+    b: Number.parseInt(normalized.slice(4, 6), 16),
+  };
+}
+
+function mixColors(from: string, to: string, amount: number) {
+  const start = parseHex(from);
+  const end = parseHex(to);
+  const t = Math.min(1, Math.max(0, amount));
+  const mix = (a: number, b: number) => Math.round(a + (b - a) * t);
+
+  return `rgb(${mix(start.r, end.r)} ${mix(start.g, end.g)} ${mix(start.b, end.b)})`;
+}
+
+function slideColor(index: number) {
+  return worksSlideCircleColors[index] ?? worksSlideCircleColors[0];
+}
+
+function createCircleColorController(viewport: HTMLElement) {
+  const track = viewport.querySelector<HTMLElement>(".works__visual-track");
+  if (!track) {
+    return {
+      syncToSlide: () => {},
+      syncToDrag: () => {},
+      dispose: () => {},
+    };
+  }
+
+  const setColor = (color: string) => {
+    track.style.setProperty("--works-circle-color", color);
+  };
+
+  const syncToSlide = (index = getCheckedSlideIndex()) => {
+    setColor(slideColor(index));
+  };
+
+  const syncToDrag = (deltaX: number) => {
+    const width = viewport.offsetWidth || 320;
+    const progress = Math.min(1, Math.abs(deltaX) / (width * 0.42));
+
+    if (progress < 0.02) {
+      syncToSlide();
+      return;
+    }
+
+    const current = getCheckedSlideIndex();
+    const target = deltaX < 0 ? nextIndex(current) : prevIndex(current);
+    setColor(mixColors(slideColor(current), slideColor(target), progress));
+  };
+
+  const onSlideChange = () => syncToSlide();
+
+  const radios = document.querySelectorAll<HTMLInputElement>('input[name="works-slide"]');
+  for (const radio of radios) {
+    radio.addEventListener("change", onSlideChange);
+  }
+
+  syncToSlide();
+
+  return {
+    syncToSlide,
+    syncToDrag,
+    dispose: () => {
+      for (const radio of radios) {
+        radio.removeEventListener("change", onSlideChange);
+      }
+    },
+  };
+}
 
 function loadGsap() {
   if (typeof window === "undefined") return Promise.resolve(null);
@@ -65,16 +146,26 @@ function goToSlide(index: number) {
   const radio = document.getElementById(slideId(index)) as HTMLInputElement | null;
   if (!radio || radio.checked) return;
   radio.checked = true;
+  radio.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
-function setSurfaceOffset(surface: HTMLElement, x: number) {
-  surface.style.transform = x ? `translateX(${x}px)` : "";
-  surface.style.opacity = x ? String(Math.max(0.55, 1 - Math.abs(x) / 280)) : "";
+function setSurfaceOffset(
+  surface: HTMLElement,
+  deltaX: number,
+  circleColor?: { syncToDrag: (deltaX: number) => void },
+) {
+  surface.style.transform = deltaX ? `translateX(${deltaX}px)` : "";
+  surface.style.opacity = deltaX ? String(Math.max(0.55, 1 - Math.abs(deltaX) / 280)) : "";
+  circleColor?.syncToDrag(deltaX);
 }
 
-function clearSurfaceOffset(surface: HTMLElement) {
+function clearSurfaceOffset(
+  surface: HTMLElement,
+  circleColor?: { syncToSlide: () => void },
+) {
   surface.style.transform = "";
   surface.style.opacity = "";
+  circleColor?.syncToSlide();
 }
 
 function commitFromDelta(deltaX: number) {
@@ -84,13 +175,19 @@ function commitFromDelta(deltaX: number) {
   else goToSlide(prevIndex(current));
 }
 
-function animateRelease(surface: HTMLElement, deltaX: number, onDone: () => void) {
+function animateRelease(
+  surface: HTMLElement,
+  deltaX: number,
+  onDone: () => void,
+  circleColor?: { syncToSlide: () => void },
+) {
   const shouldCommit = Math.abs(deltaX) >= DRAG_COMMIT_PX;
   const gsap = gsapInstance;
 
   if (!gsap) {
-    clearSurfaceOffset(surface);
+    clearSurfaceOffset(surface, circleColor);
     commitFromDelta(deltaX);
+    circleColor?.syncToSlide();
     onDone();
     return;
   }
@@ -107,7 +204,8 @@ function animateRelease(surface: HTMLElement, deltaX: number, onDone: () => void
       onComplete: () => {
         commitFromDelta(deltaX);
         gsap.set(surface, { clearProps: "transform,opacity" });
-        clearSurfaceOffset(surface);
+        clearSurfaceOffset(surface, circleColor);
+        circleColor?.syncToSlide();
         onDone();
       },
     });
@@ -121,13 +219,17 @@ function animateRelease(surface: HTMLElement, deltaX: number, onDone: () => void
     ease: "power2.out",
     onComplete: () => {
       gsap.set(surface, { clearProps: "transform,opacity" });
-      clearSurfaceOffset(surface);
+      clearSurfaceOffset(surface, circleColor);
       onDone();
     },
   });
 }
 
-function attachNativeSwipe(viewport: HTMLElement, surface: HTMLElement) {
+function attachNativeSwipe(
+  viewport: HTMLElement,
+  surface: HTMLElement,
+  circleColor: ReturnType<typeof createCircleColorController>,
+) {
   let startX = 0;
   let startY = 0;
   let tracking = false;
@@ -156,7 +258,7 @@ function attachNativeSwipe(viewport: HTMLElement, surface: HTMLElement) {
       if (locked === "y") {
         tracking = false;
         viewport.classList.remove("works__card-viewport--dragging");
-        clearSurfaceOffset(surface);
+        clearSurfaceOffset(surface, circleColor);
         return false;
       }
     }
@@ -164,7 +266,7 @@ function attachNativeSwipe(viewport: HTMLElement, surface: HTMLElement) {
     if (locked !== "x") return false;
 
     lastX = x;
-    setSurfaceOffset(surface, deltaX);
+    setSurfaceOffset(surface, deltaX, circleColor);
     return true;
   };
 
@@ -174,7 +276,7 @@ function attachNativeSwipe(viewport: HTMLElement, surface: HTMLElement) {
     tracking = false;
     locked = null;
     viewport.classList.remove("works__card-viewport--dragging");
-    animateRelease(surface, deltaX, () => {});
+    animateRelease(surface, deltaX, () => {}, circleColor);
   };
 
   const onTouchStart = (event: TouchEvent) => {
@@ -239,7 +341,7 @@ function attachNativeSwipe(viewport: HTMLElement, surface: HTMLElement) {
     viewport.removeEventListener("pointermove", onPointerMove);
     viewport.removeEventListener("pointerup", onPointerUp);
     viewport.removeEventListener("pointercancel", onPointerUp);
-    clearSurfaceOffset(surface);
+    clearSurfaceOffset(surface, circleColor);
   };
 }
 
@@ -248,6 +350,7 @@ function attachDesktopDraggable(
   surface: HTMLElement,
   gsap: GsapInstance,
   Draggable: DraggableInstance,
+  circleColor: ReturnType<typeof createCircleColorController>,
 ) {
   const instances = Draggable.create(surface, {
     type: "x",
@@ -262,17 +365,18 @@ function attachDesktopDraggable(
       gsap.set(surface, {
         opacity: Math.max(0.55, 1 - Math.abs(this.x) / 280),
       });
+      circleColor.syncToDrag(this.x);
     },
     onRelease() {
       viewport.classList.remove("works__card-viewport--dragging");
-      animateRelease(surface, this.x, () => {});
+      animateRelease(surface, this.x, () => {}, circleColor);
     },
   });
 
   return () => {
     instances[0]?.kill();
     gsap.set(surface, { clearProps: "transform,opacity" });
-    clearSurfaceOffset(surface);
+    clearSurfaceOffset(surface, circleColor);
   };
 }
 
@@ -286,19 +390,27 @@ export function initWorksCarouselDrag(viewport: HTMLElement) {
 
   initializedViewports.add(viewport);
 
+  const circleColor = createCircleColorController(viewport);
   const isCoarse = window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
-  let detach = attachNativeSwipe(viewport, surface);
+  let detach = attachNativeSwipe(viewport, surface, circleColor);
 
   if (!isCoarse) {
     loadDraggable().then((bundle) => {
       if (!bundle || !initializedViewports.has(viewport)) return;
       detach();
-      detach = attachDesktopDraggable(viewport, surface, bundle.gsap, bundle.Draggable);
+      detach = attachDesktopDraggable(
+        viewport,
+        surface,
+        bundle.gsap,
+        bundle.Draggable,
+        circleColor,
+      );
     });
   }
 
   return () => {
     detach();
+    circleColor.dispose();
     initializedViewports.delete(viewport);
   };
 }
