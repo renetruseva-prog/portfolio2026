@@ -39,15 +39,27 @@ export type WorkProject = {
   ctaLabel: string;
 };
 
+export const worksSlideCircleColors = [
+  "#D00E0E",
+  "#33E5A2",
+  "#D00E0E",
+  "#D00E0E",
+] as const;
+
 export const worksAssets = {
-  circle: "/images/portfolio/hero-ellipse.svg",
-  figure: "/images/portfolio/project-figure.png",
-  figureCut: "/images/portfolio/project-figure_cut.png",
-  balloonBlue: "/images/portfolio/balloon-blue.png",
-  balloonPink: "/images/portfolio/balloon-pink.png",
+  slide1: {
+    figure: "/images/portfolio/works-memome/slide1/project-figure.png",
+    figureCut: "/images/portfolio/works-memome/slide1/project-figure_cut.png",
+    balloonBlue: "/images/portfolio/works-memome/slide1/balloon-blue.png",
+    balloonPink: "/images/portfolio/works-memome/slide1/balloon-pink.png",
+  },
+  slide2: {
+    phone: "/images/portfolio/works-memome/slide2/memo-phone.png",
+    greenGrid: "/images/portfolio/works-memome/slide2/green-grid.svg",
+    hand: "/images/portfolio/works-memome/slide2/hand.svg",
+  },
   arrowLeft: "/images/portfolio/arrow-left.svg",
   arrowRight: "/images/portfolio/arrow-right.svg",
-  squiggle: "/images/portfolio/squiggle-works.svg",
 } as const;
 
 export const worksProjects: WorkProject[] = [
@@ -59,9 +71,9 @@ export const worksProjects: WorkProject[] = [
     ctaLabel: "See more",
   },
   {
-    id: "digital-canvas",
-    title: "Digital canvas",
-    tags: ["Creative Code", "Motion", "Web"],
+    id: "memome",
+    title: "Memome - Discover Antwerp",
+    tags: ["Creative Code", "UI/UX", "Teamwork"],
     href: "#",
     ctaLabel: "See more",
   },
