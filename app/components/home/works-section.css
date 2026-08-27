@@ -492,6 +492,115 @@
   }
 }
 
+.works__visual-panel--webrtc {
+  overflow: visible;
+}
+
+.works__visual img.works__webrtc-phone {
+  grid-row: 1 / 9;
+  grid-column: 1 / 9;
+  z-index: 2;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  justify-self: center;
+  align-self: center;
+  object-fit: contain;
+  transform: scale(1.7);
+  transform-origin: center center;
+  position: relative;
+  bottom: 2rem;
+  right: 2rem;
+}
+
+.works__webrtc-hand {
+  grid-row: 1 / 6;
+  grid-column: 4 / 9;
+  z-index: 3;
+  width: 100%;
+  height: auto;
+  justify-self: end;
+  align-self: start;
+  margin-top: -37%;
+  margin-right: -2%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.works__webrtc-sparkle {
+  z-index: 4;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.works__webrtc-sparkle--right {
+  grid-row: 1 / 5;
+  grid-column: 5 / 9;
+  width: 100;
+  justify-self: end;
+  align-self: start;
+  margin-top: -50%;
+  margin-right: 25%;
+}
+
+.works__webrtc-sparkle--left {
+  grid-row: 6 / 9;
+  grid-column: 1 / 5;
+  width: 88%;
+  justify-self: start;
+  align-self: end;
+  margin-left: -18%;
+  margin-bottom: -25%;
+}
+
+.works__webrtc-sparkle--bottom {
+  grid-row: 7 / 9;
+  grid-column: 6 / 9;
+  width: 100%;
+  justify-self: end;
+  align-self: end;
+  margin-right: -2rem;
+}
+
+.works--webrtc-intro .works__webrtc-hand--animate {
+  transform: translateY(-10%);
+}
+
+.works--webrtc-play .works__webrtc-hand--animate {
+  animation: works-webrtc-hand-press 1.15s ease-in-out 0.12s forwards;
+}
+
+.works--webrtc-ready .works__webrtc-hand--animate {
+  transform: translateY(0);
+}
+
+@keyframes works-webrtc-hand-press {
+  0% {
+    transform: translateY(-10%);
+  }
+
+  22% {
+    transform: translateY(5%);
+  }
+
+  38% {
+    transform: translateY(-6%);
+  }
+
+  58% {
+    transform: translateY(4%);
+  }
+
+  74% {
+    transform: translateY(-3%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
 .works__details {
   align-items: center;
   text-align: center;
@@ -509,6 +618,11 @@
   margin-bottom: 1rem;
   max-width: 100%;
   min-width: 0;
+}
+
+#works-slide-1:checked~.works__carousel .works__details-panel--1 .works__project-title,
+#works-slide-2:checked~.works__carousel .works__details-panel--2 .works__project-title {
+  margin-top: 2rem;
 }
 
 .works__tags {
@@ -633,6 +747,11 @@
     opacity: 1;
     transform: none;
     filter: none;
+  }
+
+  .works--webrtc-ready .works__webrtc-hand--animate {
+    animation: none;
+    transform: none;
   }
 
   .works__dot,

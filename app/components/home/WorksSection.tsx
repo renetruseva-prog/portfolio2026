@@ -4,6 +4,7 @@ import { worksAssets, worksProjects } from "~/content/site";
 import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
 import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
 import { initWorksMemomeIntro } from "~/lib/works-memome.client";
+import { initWorksWebrtcIntro } from "~/lib/works-webrtc.client";
 import "./works-section.css";
 
 const SLIDE_COUNT = worksProjects.length;
@@ -25,6 +26,7 @@ export function WorksSection() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
   const memomeRef = useRef<HTMLDivElement>(null);
+  const webrtcRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -38,6 +40,13 @@ export function WorksSection() {
     const memome = memomeRef.current;
     if (!section || !memome) return;
     return initWorksMemomeIntro(section, memome);
+  }, []);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const webrtc = webrtcRef.current;
+    if (!section || !webrtc) return;
+    return initWorksWebrtcIntro(section, webrtc);
   }, []);
 
   useEffect(() => {
@@ -180,10 +189,56 @@ export function WorksSection() {
                     />
                   </div>
 
-                  {worksProjects.slice(2).map((project, offset) => (
+                  <div
+                    ref={webrtcRef}
+                    className="works__visual works__visual-panel works__visual-panel--2 works__visual-panel--webrtc"
+                  >
+                    <img
+                      className="works__webrtc-phone"
+                      src={worksAssets.slide3.phone}
+                      alt="WebRTC phone controller interface"
+                      width={1295}
+                      height={1294}
+                      draggable={false}
+                    />
+                    <img
+                      className="works__webrtc-hand works__webrtc-hand--animate"
+                      src={worksAssets.slide3.hand}
+                      alt=""
+                      width={467}
+                      height={543}
+                      draggable={false}
+                    />
+                    <img
+                      className="works__webrtc-sparkle works__webrtc-sparkle--left works__webrtc-sparkle--animate"
+                      src={worksAssets.slide3.sparkleLeft}
+                      alt=""
+                      width={521}
+                      height={614}
+                      draggable={false}
+                    />
+                    <img
+                      className="works__webrtc-sparkle works__webrtc-sparkle--right works__webrtc-sparkle--animate"
+                      src={worksAssets.slide3.sparkleRight}
+                      alt=""
+                      width={577}
+                      height={620}
+                      draggable={false}
+                    />
+                    <img
+                      className="works__webrtc-sparkle works__webrtc-sparkle--bottom works__webrtc-sparkle--animate"
+                      src={worksAssets.slide3.sparkleBottom}
+                      alt=""
+                      width={496}
+                      height={364}
+                      draggable={false}
+                    />
+                  </div>
+
+                  {worksProjects.slice(3).map((project, offset) => (
                     <div
                       key={project.id}
-                      className={`works__visual works__visual-panel works__visual-panel--${offset + 2} works__visual-panel--placeholder`}
+                      className={`works__visual works__visual-panel works__visual-panel--${offset + 3} works__visual-panel--placeholder`}
                     />
                   ))}
                 </div>
