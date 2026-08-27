@@ -1,154 +1,217 @@
-import { useCallback, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { worksAssets, worksProjects } from "~/content/site";
+import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
+import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
 import "./works-section.css";
 
+const SLIDE_COUNT = worksProjects.length;
+
+function slideId(index: number) {
+  return `works-slide-${index}`;
+}
+
+function prevIndex(index: number) {
+  return (index - 1 + SLIDE_COUNT) % SLIDE_COUNT;
+}
+
+function nextIndex(index: number) {
+  return (index + 1) % SLIDE_COUNT;
+}
+
 export function WorksSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const projectCount = worksProjects.length;
-  const project = worksProjects[activeIndex];
+  const sectionRef = useRef<HTMLElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const visualRef = useRef<HTMLDivElement>(null);
 
-  const goTo = useCallback(
-    (index: number) => {
-      setActiveIndex((index + projectCount) % projectCount);
-    },
-    [projectCount],
-  );
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const visual = visualRef.current;
+    if (!section || !visual) return;
+    return initWorksBalloonIntro(section, visual);
+  }, []);
 
-  const goPrev = useCallback(() => {
-    goTo(activeIndex - 1);
-  }, [activeIndex, goTo]);
-
-  const goNext = useCallback(() => {
-    goTo(activeIndex + 1);
-  }, [activeIndex, goTo]);
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    return initWorksCarouselDrag(viewport);
+  }, []);
 
   return (
-    <section id="works" className="works" aria-labelledby="works-title">
+    <section
+      ref={sectionRef}
+      id="works"
+      className="works"
+      aria-labelledby="works-title"
+    >
       <h2 id="works-title" className="works__title display-title">
         Works
       </h2>
 
-      <div className="works__carousel">
-        <button
-          type="button"
-          className="works__nav works__nav--prev"
-          aria-label="Previous project"
-          onClick={goPrev}
-        >
-          <img
-            className="works__nav-icon works__nav-icon--prev"
-            src={worksAssets.arrowLeft}
-            alt=""
-            width={83}
-            height={37}
+      <article className="works__card">
+        {worksProjects.map((project, index) => (
+          <input
+            key={project.id}
+            type="radio"
+            name="works-slide"
+            id={slideId(index)}
+            className="works__radio"
+            defaultChecked={index === 0}
+            tabIndex={-1}
+            aria-label={`Show project ${index + 1}: ${project.title}`}
           />
-        </button>
+        ))}
 
-        <div className="works__stage" aria-live="polite" aria-atomic="true">
-          <div className="works__visual">
-            <img
-              className="works__circle"
-              src={worksAssets.circle}
-              alt=""
-              width={274}
-              height={274}
-            />
-            <img
-              className="works__figure"
-              src={worksAssets.figure}
-              alt=""
-              width={2000}
-              height={2083}
-            />
-            <img
-              className="works__balloon works__balloon--left works__balloon--animate"
-              src={worksAssets.balloonBlue}
-              alt=""
-              width={945}
-              height={1024}
-            />
-            <img
-              className="works__balloon works__balloon--top works__balloon--animate works__balloon--delay-1"
-              src={worksAssets.balloonPink}
-              alt=""
-              width={686}
-              height={1024}
-            />
-            <img
-              className="works__balloon works__balloon--right works__balloon--animate works__balloon--delay-2"
-              src={worksAssets.balloonBlue}
-              alt=""
-              width={945}
-              height={1024}
-            />
+        <div className="works__carousel">
+          {worksProjects.map((_, index) => (
+            <label
+              key={`prev-${index}`}
+              htmlFor={slideId(prevIndex(index))}
+              className={`works__nav works__nav--prev works__nav--when-${index}`}
+              aria-label="Previous project"
+            >
+              <img
+                className="works__nav-icon"
+                src={worksAssets.arrowLeft}
+                alt=""
+                width={83}
+                height={37}
+              />
+            </label>
+          ))}
+
+          <div ref={viewportRef} className="works__card-viewport">
+            <div className="works__drag-surface">
+              <div className="works__stage">
+                <div ref={visualRef} className="works__visual">
+                  <img
+                    className="works__circle"
+                    src={worksAssets.circle}
+                    alt=""
+                    width={274}
+                    height={274}
+                    draggable={false}
+                  />
+                  <div className="works__figure-layer works__figure-layer--clipped">
+                    <div className="works__figure-box">
+                      <img
+                        className="works__figure"
+                        src={worksAssets.figure}
+                        alt=""
+                        width={2000}
+                        height={2083}
+                        draggable={false}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="works__figure-layer works__figure-layer--top">
+                    <div className="works__figure-box">
+                      <img
+                        className="works__figure works__figure--cut"
+                        src={worksAssets.figureCut}
+                        alt=""
+                        width={467}
+                        height={684}
+                        draggable={false}
+                      />
+                    </div>
+                  </div>
+                  <div className="works__balloons">
+                    <img
+                      className="works__balloon works__balloon--left works__balloon--animate"
+                      src={worksAssets.balloonBlue}
+                      alt=""
+                      width={945}
+                      height={1024}
+                    />
+                    <img
+                      className="works__balloon works__balloon--top works__balloon--animate works__balloon--delay-1"
+                      src={worksAssets.balloonPink}
+                      alt=""
+                      width={686}
+                      height={1024}
+                    />
+                    <img
+                      className="works__balloon works__balloon--right works__balloon--animate works__balloon--delay-2"
+                      src={worksAssets.balloonBlue}
+                      alt=""
+                      width={945}
+                      height={1024}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="works__details-track" aria-live="polite" aria-atomic="true">
+                {worksProjects.map((project, index) => (
+                  <div
+                    key={project.id}
+                    className={`works__details works__details-panel works__details-panel--${index}`}
+                  >
+                    <h3 className="works__project-title display-title">{project.title}</h3>
+
+                    <p className="works__tags">
+                      {project.tags.map((tag, tagIndex) => (
+                        <span key={tag} className="works__tag">
+                          {tagIndex > 0 && (
+                            <span className="works__tag-separator" aria-hidden="true">
+                              {" "}
+                              *{" "}
+                            </span>
+                          )}
+                          <span
+                            className={
+                              tagIndex === 0
+                                ? "works__tag-label works__tag-label--accent"
+                                : "works__tag-label"
+                            }
+                          >
+                            {tag}
+                          </span>
+                        </span>
+                      ))}
+                    </p>
+
+                    <a href={project.href} className="works__cta">
+                      {project.ctaLabel}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
+
+          {worksProjects.map((_, index) => (
+            <label
+              key={`next-${index}`}
+              htmlFor={slideId(nextIndex(index))}
+              className={`works__nav works__nav--next works__nav--when-${index}`}
+              aria-label="Next project"
+            >
+              <img
+                className="works__nav-icon works__nav-icon--next"
+                src={worksAssets.arrowLeft}
+                alt=""
+                width={83}
+                height={37}
+              />
+            </label>
+          ))}
         </div>
 
-        <button
-          type="button"
-          className="works__nav works__nav--next"
-          aria-label="Next project"
-          onClick={goNext}
-        >
-          <img
-            className="works__nav-icon"
-            src={worksAssets.arrowRight}
-            alt=""
-            width={83}
-            height={37}
-          />
-        </button>
-      </div>
-
-      <div className="works__details">
-        <h3 className="works__project-title display-title">
-          <span className="works__project-title-line">{project.title[0]}</span>
-          <span className="works__project-title-line">{project.title[1]}</span>
-        </h3>
-
-        <p className="works__tags">
-          {project.tags.map((tag, index) => (
-            <span key={tag} className="works__tag">
-              {index > 0 && (
-                <span className="works__tag-separator" aria-hidden="true">
-                  {" "}
-                  *{" "}
-                </span>
-              )}
-              <span
-                className={
-                  index === 0 ? "works__tag-label works__tag-label--accent" : "works__tag-label"
-                }
-              >
-                {tag}
-              </span>
-            </span>
-          ))}
-        </p>
-
-        <a href={project.href} className="works__cta">
-          {project.ctaLabel}
-        </a>
-      </div>
-
-      <div className="works__dots" role="tablist" aria-label="Project slides">
-        {worksProjects.map((item, index) => {
-          const isActive = index === activeIndex;
-
-          return (
-            <button
-              key={item.id}
-              type="button"
+        <div className="works__dots" role="tablist" aria-label="Project slides">
+          {worksProjects.map((project, index) => (
+            <label
+              key={project.id}
+              htmlFor={slideId(index)}
               role="tab"
-              className={`works__dot${isActive ? " works__dot--active" : ""}`}
-              aria-label={`Go to project ${index + 1}`}
-              aria-selected={isActive}
-              onClick={() => goTo(index)}
+              className={`works__dot works__dot--${index}`}
+              aria-label={`Go to project ${index + 1}: ${project.title}`}
             />
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </article>
     </section>
   );
 }

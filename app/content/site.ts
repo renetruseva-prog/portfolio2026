@@ -33,7 +33,7 @@ export const heroAssets = {
 
 export type WorkProject = {
   id: string;
-  title: readonly [string, string];
+  title: string;
   tags: readonly string[];
   href: string;
   ctaLabel: string;
@@ -42,6 +42,7 @@ export type WorkProject = {
 export const worksAssets = {
   circle: "/images/portfolio/hero-ellipse.svg",
   figure: "/images/portfolio/project-figure.png",
+  figureCut: "/images/portfolio/project-figure_cut.png",
   balloonBlue: "/images/portfolio/balloon-blue.png",
   balloonPink: "/images/portfolio/balloon-pink.png",
   arrowLeft: "/images/portfolio/arrow-left.svg",
@@ -52,22 +53,29 @@ export const worksAssets = {
 export const worksProjects: WorkProject[] = [
   {
     id: "beauty-of-transgression",
-    title: ["The beauty", "of transgression"],
+    title: "The beauty of transgression",
     tags: ["Creative Code", "Design", "UI/UX"],
     href: "#",
     ctaLabel: "See more",
   },
   {
     id: "digital-canvas",
-    title: ["Digital", "canvas"],
+    title: "Digital canvas",
     tags: ["Creative Code", "Motion", "Web"],
     href: "#",
     ctaLabel: "See more",
   },
   {
     id: "form-and-feeling",
-    title: ["Form and", "feeling"],
+    title: "Form and feeling",
     tags: ["Design", "UI/UX", "Branding"],
+    href: "#",
+    ctaLabel: "See more",
+  },
+  {
+    id: "light-in-motion",
+    title: "Light in motion",
+    tags: ["Motion", "Creative Code", "3D"],
     href: "#",
     ctaLabel: "See more",
   },
