@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { worksAssets, worksProjects } from "~/content/site";
 import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
 import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
+import { initWorksMealsIntro } from "~/lib/works-meals.client";
 import { initWorksMemomeIntro } from "~/lib/works-memome.client";
 import { initWorksWebrtcIntro } from "~/lib/works-webrtc.client";
 import "./works-section.css";
@@ -27,6 +28,7 @@ export function WorksSection() {
   const visualRef = useRef<HTMLDivElement>(null);
   const memomeRef = useRef<HTMLDivElement>(null);
   const webrtcRef = useRef<HTMLDivElement>(null);
+  const mealsRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -47,6 +49,13 @@ export function WorksSection() {
     const webrtc = webrtcRef.current;
     if (!section || !webrtc) return;
     return initWorksWebrtcIntro(section, webrtc);
+  }, []);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const meals = mealsRef.current;
+    if (!section || !meals) return;
+    return initWorksMealsIntro(section, meals);
   }, []);
 
   useEffect(() => {
@@ -235,12 +244,43 @@ export function WorksSection() {
                     />
                   </div>
 
-                  {worksProjects.slice(3).map((project, offset) => (
-                    <div
-                      key={project.id}
-                      className={`works__visual works__visual-panel works__visual-panel--${offset + 3} works__visual-panel--placeholder`}
+                  <div
+                    ref={mealsRef}
+                    className="works__visual works__visual-panel works__visual-panel--3 works__visual-panel--meals"
+                  >
+                    <img
+                      className="works__meals-foodbox"
+                      src={worksAssets.slide4.foodbox}
+                      alt="Miles and Meals food delivery box with ingredients"
+                      width={1157}
+                      height={1129}
+                      draggable={false}
                     />
-                  ))}
+                    <img
+                      className="works__meals-knife works__meals-prop--animate"
+                      src={worksAssets.slide4.knife}
+                      alt=""
+                      width={89}
+                      height={76}
+                      draggable={false}
+                    />
+                    <img
+                      className="works__meals-fork works__meals-prop--animate"
+                      src={worksAssets.slide4.fork}
+                      alt=""
+                      width={92}
+                      height={65}
+                      draggable={false}
+                    />
+                    <img
+                      className="works__meals-plate works__meals-prop--animate"
+                      src={worksAssets.slide4.plate}
+                      alt=""
+                      width={105}
+                      height={99}
+                      draggable={false}
+                    />
+                  </div>
                 </div>
               </div>
 
