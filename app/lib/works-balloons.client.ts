@@ -1,5 +1,14 @@
+const BALLOON_SLIDE_INDEX = 0;
 const POP_MS = 850;
 const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
+
+function getCheckedSlideIndex() {
+  const checked = document.querySelector<HTMLInputElement>(
+    'input[name="works-slide"]:checked',
+  );
+  if (!checked) return 0;
+  return Number(checked.id.replace("works-slide-", ""));
+}
 
 function readBalloonMirror(balloon: HTMLElement) {
   const value = getComputedStyle(balloon).getPropertyValue("--balloon-mirror").trim();
@@ -96,27 +105,20 @@ export function initWorksBalloonIntro(section: HTMLElement, visual: HTMLElement)
   }
 
   let disposed = false;
-  let played = false;
+  let scrollIntroPlayed = false;
   let finishTimer = 0;
   let pollTimer = 0;
   let observer: IntersectionObserver | null = null;
   let rafId = 0;
+  let holdOffsets = measureHoldOffsets(visual, balloons);
 
-  const holdOffsets = measureHoldOffsets(visual, balloons);
-  holdBalloonsAtCenter(section, visual, balloons, holdOffsets);
+  const reset = () => {
+    window.clearTimeout(finishTimer);
+    holdOffsets = measureHoldOffsets(visual, balloons);
+    holdBalloonsAtCenter(section, visual, balloons, holdOffsets);
+  };
 
-  const shouldPlay = () => isTargetVisible(visual) || isTargetVisible(section);
-
-  const play = () => {
-    if (played || disposed) return;
-    played = true;
-    detach();
-    window.clearInterval(pollTimer);
-
-    if (import.meta.env.DEV) {
-      console.log("[works-balloons] play()");
-    }
-
+  const runPop = () => {
     section.classList.remove("works--balloons-hold");
     section.classList.add("works--balloons-play");
 
@@ -144,38 +146,75 @@ export function initWorksBalloonIntro(section: HTMLElement, visual: HTMLElement)
     }, 20);
   };
 
-  const tryPlay = () => {
-    if (played || disposed || !shouldPlay()) return;
+  const play = (source: "scroll" | "slide") => {
+    if (disposed) return;
+    if (source === "scroll" && scrollIntroPlayed) return;
+    if (getCheckedSlideIndex() !== BALLOON_SLIDE_INDEX) return;
+
+    window.clearTimeout(finishTimer);
+    holdOffsets = measureHoldOffsets(visual, balloons);
+    holdBalloonsAtCenter(section, visual, balloons, holdOffsets);
+
+    requestAnimationFrame(() => {
+      if (disposed) return;
+      runPop();
+    });
+
+    if (source === "scroll") {
+      scrollIntroPlayed = true;
+      detachScroll();
+      window.clearInterval(pollTimer);
+    }
+  };
+
+  const tryPlayScroll = () => {
+    if (disposed || scrollIntroPlayed) return;
+    if (getCheckedSlideIndex() !== BALLOON_SLIDE_INDEX) return;
+    if (!isTargetVisible(visual) && !isTargetVisible(section)) return;
 
     if (import.meta.env.DEV) {
       console.log("[works-balloons] tryPlay()");
     }
 
-    play();
+    play("scroll");
   };
 
-  const scheduleTryPlay = () => {
+  const scheduleTryPlayScroll = () => {
     cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(tryPlay);
+    rafId = requestAnimationFrame(tryPlayScroll);
   };
 
   const ensureVisibleFallback = () => {
-    if (disposed || played) return;
-    if (!shouldPlay()) return;
+    if (disposed || scrollIntroPlayed) return;
+    if (getCheckedSlideIndex() !== BALLOON_SLIDE_INDEX) return;
+    if (!isTargetVisible(visual) && !isTargetVisible(section)) return;
 
     if (import.meta.env.DEV) {
       console.warn("[works-balloons] fallback reveal");
     }
 
-    played = true;
-    detach();
     revealReady(section, balloons);
+    scrollIntroPlayed = true;
+    detachScroll();
+    window.clearInterval(pollTimer);
+  };
+
+  const onSlideChange = () => {
+    if (getCheckedSlideIndex() === BALLOON_SLIDE_INDEX) {
+      if (import.meta.env.DEV) {
+        console.log("[works-balloons] play(slide)");
+      }
+      play("slide");
+    } else {
+      window.clearTimeout(finishTimer);
+      reset();
+    }
   };
 
   observer = new IntersectionObserver(
     (entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
-        scheduleTryPlay();
+        scheduleTryPlayScroll();
       }
     },
     {
@@ -188,44 +227,50 @@ export function initWorksBalloonIntro(section: HTMLElement, visual: HTMLElement)
   observer.observe(visual);
   observer.observe(section);
 
-  const attach = () => {
-    document.addEventListener("scroll", scheduleTryPlay, { passive: true, capture: true });
-    document.addEventListener("touchmove", scheduleTryPlay, { passive: true, capture: true });
-    document.addEventListener("touchend", scheduleTryPlay, { passive: true, capture: true });
-    window.addEventListener("resize", scheduleTryPlay, { passive: true });
-    window.visualViewport?.addEventListener("scroll", scheduleTryPlay, { passive: true });
-    window.visualViewport?.addEventListener("resize", scheduleTryPlay, { passive: true });
+  const attachScroll = () => {
+    document.addEventListener("scroll", scheduleTryPlayScroll, { passive: true, capture: true });
+    document.addEventListener("touchmove", scheduleTryPlayScroll, { passive: true, capture: true });
+    document.addEventListener("touchend", scheduleTryPlayScroll, { passive: true, capture: true });
+    window.addEventListener("resize", scheduleTryPlayScroll, { passive: true });
+    window.visualViewport?.addEventListener("scroll", scheduleTryPlayScroll, { passive: true });
+    window.visualViewport?.addEventListener("resize", scheduleTryPlayScroll, { passive: true });
   };
 
-  const detach = () => {
+  const detachScroll = () => {
     cancelAnimationFrame(rafId);
     observer?.disconnect();
     observer = null;
-    document.removeEventListener("scroll", scheduleTryPlay, true);
-    document.removeEventListener("touchmove", scheduleTryPlay, true);
-    document.removeEventListener("touchend", scheduleTryPlay, true);
-    window.removeEventListener("resize", scheduleTryPlay);
-    window.visualViewport?.removeEventListener("scroll", scheduleTryPlay);
-    window.visualViewport?.removeEventListener("resize", scheduleTryPlay);
+    document.removeEventListener("scroll", scheduleTryPlayScroll, true);
+    document.removeEventListener("touchmove", scheduleTryPlayScroll, true);
+    document.removeEventListener("touchend", scheduleTryPlayScroll, true);
+    window.removeEventListener("resize", scheduleTryPlayScroll);
+    window.visualViewport?.removeEventListener("scroll", scheduleTryPlayScroll);
+    window.visualViewport?.removeEventListener("resize", scheduleTryPlayScroll);
   };
 
-  attach();
-  scheduleTryPlay();
-  window.addEventListener("load", scheduleTryPlay, { once: true });
+  const radios = document.querySelectorAll<HTMLInputElement>('input[name="works-slide"]');
+  for (const radio of radios) {
+    radio.addEventListener("change", onSlideChange);
+  }
+
+  reset();
+  attachScroll();
+  scheduleTryPlayScroll();
+  window.addEventListener("load", scheduleTryPlayScroll, { once: true });
 
   pollTimer = window.setInterval(() => {
-    if (disposed || played) {
+    if (disposed || scrollIntroPlayed) {
       window.clearInterval(pollTimer);
       return;
     }
 
-    if (shouldPlay()) {
-      tryPlay();
+    if (getCheckedSlideIndex() === BALLOON_SLIDE_INDEX) {
+      tryPlayScroll();
     }
   }, 300);
 
   window.setTimeout(() => {
-    if (!disposed && !played && shouldPlay()) {
+    if (!disposed && !scrollIntroPlayed && getCheckedSlideIndex() === BALLOON_SLIDE_INDEX) {
       ensureVisibleFallback();
     }
   }, 2500);
@@ -234,6 +279,9 @@ export function initWorksBalloonIntro(section: HTMLElement, visual: HTMLElement)
     disposed = true;
     window.clearTimeout(finishTimer);
     window.clearInterval(pollTimer);
-    detach();
+    detachScroll();
+    for (const radio of radios) {
+      radio.removeEventListener("change", onSlideChange);
+    }
   };
 }

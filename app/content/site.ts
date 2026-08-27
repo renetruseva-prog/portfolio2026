@@ -43,7 +43,7 @@ export const worksSlideCircleColors = [
   "#D00E0E",
   "#33E5A2",
   "#1E50E1",
-  "#D00E0E",
+  "#D34421",
 ] as const;
 
 export const worksAssets = {
@@ -64,6 +64,12 @@ export const worksAssets = {
     sparkleLeft: "/images/portfolio/works-memome/slide3/left_sparkle.png",
     sparkleRight: "/images/portfolio/works-memome/slide3/right_sparkle.png",
     sparkleBottom: "/images/portfolio/works-memome/slide3/sparkle_bottom.png",
+  },
+  slide4: {
+    foodbox: "/images/portfolio/works-memome/slide4/foodbox.png",
+    knife: "/images/portfolio/works-memome/slide4/knife.svg",
+    fork: "/images/portfolio/works-memome/slide4/fork.svg",
+    plate: "/images/portfolio/works-memome/slide4/plate.svg",
   },
   arrowLeft: "/images/portfolio/arrow-left.svg",
   arrowRight: "/images/portfolio/arrow-right.svg",
@@ -92,9 +98,9 @@ export const worksProjects: WorkProject[] = [
     ctaLabel: "See more",
   },
   {
-    id: "light-in-motion",
-    title: "Light in motion",
-    tags: ["Motion", "Creative Code", "3D"],
+    id: "miles-and-meals",
+    title: "Miles and Meals",
+    tags: ["Branding", "Design", "UI/UX"],
     href: "#",
     ctaLabel: "See more",
   },
