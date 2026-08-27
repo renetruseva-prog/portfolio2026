@@ -23,9 +23,13 @@ export default defineConfig({
     dedupe: ["react", "react-dom"],
     tsconfigPaths: true,
   },
+  optimizeDeps: {
+    include: ["gsap", "gsap/Draggable", "react", "react-dom", "react-router"],
+  },
   server: {
     host: true,
     port,
+    origin: `http://${localIp}:${port}`,
     hmr: {
       host: localIp,
       port,

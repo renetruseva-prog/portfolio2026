@@ -10,39 +10,152 @@
   font-size: clamp(2.5rem, 12vw, 4.375rem);
   line-height: 0.95;
   text-transform: none;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+}
+
+.works__card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  position: relative;
+  isolation: isolate;
+}
+
+.works__radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.works__radio:focus {
+  outline: none;
+}
+
+.works__card-viewport {
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  overflow: visible;
+  touch-action: pan-y;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.works__card-viewport--dragging {
+  cursor: grabbing;
+}
+
+.works__card-viewport--dragging .works__drag-surface {
+  transition: none;
+  user-select: none;
+}
+
+.works__drag-surface {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  touch-action: pan-y;
+  will-change: transform;
+  align-items: center;
+}
+
+.works__details-track {
+  display: grid;
+  grid-template: 1fr / 1fr;
+}
+
+.works__details-panel {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+#works-slide-0:checked ~ .works__carousel .works__details-panel--0,
+#works-slide-1:checked ~ .works__carousel .works__details-panel--1,
+#works-slide-2:checked ~ .works__carousel .works__details-panel--2,
+#works-slide-3:checked ~ .works__carousel .works__details-panel--3 {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .works__carousel {
+  container-type: inline-size;
+  container-name: works-carousel;
   display: grid;
   grid-template-columns: minmax(0, 2.75rem) minmax(0, 1fr) minmax(0, 2.75rem);
-  align-items: center;
+  align-items: start;
   gap: 0.25rem;
   width: 100%;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
 }
 
 .works__nav {
-  display: flex;
+  display: none;
+  grid-row: 1;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-height: 2.75rem;
-  padding: 0.25rem;
+  justify-self: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  margin: 0;
+  margin-top: calc(min(100cqw, 22rem) * 0.4 - 1.375rem);
+  border: none;
+  background: none;
   transition: opacity 0.2s ease;
+  touch-action: manipulation;
+  cursor: pointer;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-.works__nav:hover {
-  opacity: 0.75;
+.works__nav--prev {
+  grid-column: 1;
+}
+
+.works__nav--next {
+  grid-column: 3;
+}
+
+#works-slide-0:checked ~ .works__carousel .works__nav--when-0,
+#works-slide-1:checked ~ .works__carousel .works__nav--when-1,
+#works-slide-2:checked ~ .works__carousel .works__nav--when-2,
+#works-slide-3:checked ~ .works__carousel .works__nav--when-3 {
+  display: flex;
 }
 
 .works__nav-icon {
   display: block;
+  width: 2.375rem;
   height: auto;
-  scale: -1;
-  min-width: 2rem;
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
-.works__nav-icon--prev {
+.works__nav-icon--next {
   transform: scaleX(-1);
 }
 
@@ -52,6 +165,14 @@
   width: 100%;
   max-width: 22rem;
   justify-self: center;
+  margin-bottom: 1rem;
+  overflow: visible;
+}
+
+.works__visual,
+.works__visual img {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .works__visual {
@@ -60,6 +181,12 @@
   grid-template-rows: repeat(8, 1fr);
   aspect-ratio: 1;
   width: 100%;
+  pointer-events: none;
+  user-select: none;
+  /* cqw tracks .works__stage, so the figure scales with the circle.
+     Tuned so the cut image's hard bottom edge stays hidden inside the circle. */
+  --figure-width: 158.4cqw;
+  --figure-top: -28cqw;
 }
 
 .works__circle {
@@ -74,21 +201,50 @@
   align-self: center;
 }
 
-.works__figure {
-  grid-row: 1 / 8;
-  grid-column: 1 / 8;
+/* Spans the same square as the circle image, so border-radius: 50% traces the circle exactly. */
+.works__figure-layer {
+  grid-row: 1 / 9;
+  grid-column: 1 / 9;
+}
+
+.works__figure-layer--clipped {
   z-index: 1;
-  width: auto;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.works__figure-layer--top {
+  z-index: 2;
+}
+
+/* Both layers share this box, so the two figure images stay pixel-aligned. */
+.works__figure-box {
+  display: flow-root;
+  width: var(--figure-width);
+  height: calc(var(--figure-width) * 2083 / 2000);
+  /* auto margins collapse to zero here because the box is wider than the circle. */
+  margin-left: calc((100cqw - var(--figure-width)) / 2);
+  margin-top: var(--figure-top);
+}
+
+.works__figure {
+  width: 116%;
   height: 100%;
-  max-width: 125%;
   object-fit: contain;
-  object-position: center bottom;
-  justify-self: center;
-  align-self: end;
+}
+
+/* Crop offsets of project-figure_cut.png measured against project-figure.png. */
+.works__figure--cut {
+  width: 48.44%;
+  height: auto;
+  margin-left: 28.44%;
+  margin-top: 8.75%;
+  justify-self: start;
+  align-self: start;
 }
 
 .works__balloon {
-  z-index: 2;
+  z-index: 3;
   width: 100%;
   height: auto;
   max-height: 100%;
@@ -131,7 +287,44 @@
   left: 0;
 }
 
-.works__balloon--animate {
+.works__balloons {
+  grid-row: 1 / 9;
+  grid-column: 1 / 9;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  z-index: 3;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.works--balloons-hold .works__balloons {
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.works--balloons-measure .works__balloons {
+  overflow: visible;
+  border-radius: 0;
+}
+
+.works--balloons-play .works__balloons {
+  overflow: visible;
+  border-radius: 0;
+}
+
+.works--balloons-hold .works__balloon--animate {
+  opacity: 1;
+  animation: none !important;
+}
+
+.works--balloons-play .works__balloon--animate {
+  opacity: 1;
+  animation: none !important;
+  will-change: transform;
+}
+
+.works--balloons-ready .works__balloon--animate {
   animation: works-float 5s ease-in-out infinite;
 }
 
@@ -144,33 +337,26 @@
 }
 
 .works__details {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
   text-align: center;
 }
 
 .works__project-title {
-  display: flex;
-  flex-direction: column;
-  gap: 0.05em;
   margin: 0;
-  font-size: clamp(2rem, 10vw, 3.75rem);
-  line-height: 0.95;
+  font-size: clamp(2rem, 8vw, 3.75rem);
+  line-height: 1.3;
   text-transform: uppercase;
-}
-
-.works__project-title-line {
-  display: block;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .works__tags {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 1.25rem;
   line-height: 1.4;
   color: var(--color-text);
+  margin-bottom: 1rem;
 }
 
 .works__tag-separator {
@@ -178,7 +364,7 @@
 }
 
 .works__tag-label--accent {
-  color: var(--color-accent);
+  color: #FF1616;
 }
 
 .works__cta {
@@ -192,8 +378,14 @@
   color: var(--color-bg);
   font-family: var(--font-ui);
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
   transition: opacity 0.2s ease;
+  margin-top: 0.5rem;
+  min-width: 11rem;
+  position: relative;
+  z-index: 5;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .works__cta:hover {
@@ -205,30 +397,47 @@
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
+  position: relative;
+  z-index: 10;
 }
 
 .works__dot {
   position: relative;
+  display: block;
   width: 0.65rem;
   height: 0.65rem;
+  margin: 0;
+  padding: 0;
   border-radius: 50%;
   background-color: #d9d9d9;
-  transition: transform 0.2s ease;
+  border: 1px solid transparent;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  transition:
+    width 0.3s ease,
+    height 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
-.works__dot:hover {
-  transform: scale(1.1);
-}
-
-.works__dot--active {
-  width: 1.5625rem;
-  height: 1.5625rem;
+#works-slide-0:checked ~ .works__dots .works__dot--0,
+#works-slide-1:checked ~ .works__dots .works__dot--1,
+#works-slide-2:checked ~ .works__dots .works__dot--2,
+#works-slide-3:checked ~ .works__dots .works__dot--3 {
+  width: 2.75rem;
+  height: 2.75rem;
   background-color: transparent;
-  border: 1px solid #d9d9d9;
+  border-color: #d9d9d9;
 }
 
-.works__dot--active::after {
+#works-slide-0:checked ~ .works__dots .works__dot--0::after,
+#works-slide-1:checked ~ .works__dots .works__dot--1::after,
+#works-slide-2:checked ~ .works__dots .works__dot--2::after,
+#works-slide-3:checked ~ .works__dots .works__dot--3::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -252,19 +461,24 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .works__balloon--animate {
+  .works--balloons-ready .works__balloon--animate {
     animation: none;
+    opacity: 1;
+  }
+
+  .works__dot,
+  .works__details-panel {
+    transition: none;
   }
 }
 
 @media (min-width: 48rem) {
   .works {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
     grid-template-areas:
-      "title carousel"
-      "details carousel"
-      "dots carousel";
+      "title card"
+      "title card";
     column-gap: clamp(2rem, 5vw, 5rem);
     row-gap: 1.5rem;
     align-items: center;
@@ -275,20 +489,39 @@
     grid-area: title;
     align-self: end;
     font-size: clamp(4rem, 6vw, 5.625rem);
+    margin-bottom: 0;
+  }
+
+  .works__card {
+    grid-area: card;
   }
 
   .works__carousel {
-    grid-area: carousel;
     grid-template-columns: minmax(0, 3.5rem) minmax(0, 1fr) minmax(0, 3.5rem);
     gap: 0.75rem;
   }
 
-  .works__stage {
-    max-width: 28rem;
+  .works__nav {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-top: calc(min(100cqw, 28rem) * 0.4 - 1.75rem);
   }
 
-  .works__details {
-    grid-area: details;
+  .works__nav-icon {
+    width: 2.75rem;
+  }
+
+  .works__card-viewport {
+    max-width: 28rem;
+    justify-self: center;
+  }
+
+  .works__stage {
+    max-width: none;
+  }
+
+  .works__details,
+  .works__details-panel {
     align-items: flex-start;
     text-align: left;
   }
@@ -298,7 +531,6 @@
   }
 
   .works__dots {
-    grid-area: dots;
     justify-content: flex-start;
     margin-top: 0;
   }
