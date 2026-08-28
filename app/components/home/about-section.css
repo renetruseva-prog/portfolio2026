@@ -1,0 +1,357 @@
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 3rem 0 1rem;
+}
+
+.about__title {
+  margin: 0;
+  font-size: clamp(2.5rem, 12vw, 4.375rem);
+  line-height: 0.95;
+  text-transform: none;
+}
+
+.about__stack {
+  position: relative;
+}
+
+.about__stack-pin {
+  position: sticky;
+  top: 5.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0 2rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.about__stack-stage {
+  position: relative;
+  width: min(100%, 13.65rem);
+  aspect-ratio: 1528 / 2036;
+}
+
+.about__stack-backdrop {
+  position: absolute;
+  z-index: 0;
+  width: 15rem;
+  height: 19rem;
+  aspect-ratio: 1;
+  left: -4%;
+  background-color: #D00E0E;
+  --about-backdrop-rotate: -11deg;
+  transform: rotate(var(--about-backdrop-rotate));
+  transform-origin: center center;
+}
+
+.about__stack-backdrop.is-switching {
+  animation: about-backdrop-rotate 0.45s ease;
+}
+
+@keyframes about-backdrop-rotate {
+  0% {
+    transform: rotate(-11deg);
+  }
+
+  50% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(-11deg);
+  }
+}
+
+.about__photo {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--about-photo-index, 0) + 1);
+  margin: 0;
+  opacity: 0;
+  transform: translate3d(0, 1.75rem, 0) scale(0.96);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.about__photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-width: none;
+  border-radius: 0.125rem;
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.22);
+}
+
+.about__photo-caption {
+  position: absolute;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  font-family: var(--font-handwritten);
+  font-size: clamp(1rem, 4.5vw, 1.35rem);
+  line-height: 1.05;
+  color: #111;
+  pointer-events: none;
+}
+
+.about__photo-caption--top-left {
+  top: 8%;
+  left: 8%;
+}
+
+.about__photo-caption--bottom-left {
+  bottom: 8%;
+  left: 8%;
+}
+
+.about__photo-caption-line {
+  display: block;
+}
+
+.about__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.about__intro-heading {
+  margin: 0;
+  font-size: clamp(2rem, 9vw, 3rem);
+  line-height: 0.95;
+  text-transform: none;
+}
+
+.about__paragraph {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.about__paragraph-strong {
+  font-weight: 700;
+}
+
+.about__accent {
+  --accent-progress: 0;
+  color: var(--color-text);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0.06em 0.14em;
+  margin: 0 -0.08em;
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: calc(var(--accent-progress) * 100%) 100%;
+}
+
+.about__accent.is-revealed {
+  --accent-progress: 1;
+}
+
+.about__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  width: fit-content;
+  min-height: var(--btn-height-mobile);
+  padding: 0.375rem 1.5rem;
+  border-radius: 9999px;
+  background-color: var(--color-cream);
+  color: var(--color-bg);
+  font-family: var(--font-ui);
+  font-size: 1.125rem;
+  font-weight: 700;
+  transition: opacity 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.about__cta:hover {
+  opacity: 0.88;
+}
+
+.about__cta-arrow {
+  display: block;
+  width: 1rem;
+  height: auto;
+  flex-shrink: 0;
+  filter: brightness(0);
+}
+
+.about__quote {
+  margin: 3rem 0 0;
+  padding: 0;
+}
+
+.about__quote-text {
+  margin: 0;
+  max-width: 9.5em;
+  font-size: clamp(3.5em, 15.5vw, 5rem);
+  line-height: 1.4;
+  text-transform: none;
+}
+
+.about__quote-line {
+  display: block;
+  --line-progress: 0;
+  opacity: var(--line-progress);
+  transform: translate3d(0, calc((1 - var(--line-progress)) * 1rem), 0);
+  will-change: opacity, transform;
+}
+
+.about__quote-line.is-revealed {
+  --line-progress: 1;
+}
+
+.about__quote-unit {
+  display: inline;
+}
+
+.about__quote-break {
+  display: block;
+  height: 0;
+}
+
+.about__quote-phrase {
+  white-space: nowrap;
+}
+
+.about__highlight {
+  position: relative;
+  display: inline-block;
+  color: #686866;
+  --highlight-draw: 0;
+}
+
+.about__highlight-mark {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 3.5625em;
+  height: auto;
+  max-width: none;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.about__highlight-mark__stroke {
+  fill: none;
+  stroke: white;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+
+.about__highlight-mark__stroke--outer {
+  stroke-width: 54;
+  stroke-dashoffset: calc(1 - var(--highlight-draw, 0));
+}
+
+.about__highlight-mark__stroke--inner {
+  stroke-width: 46;
+  stroke-dashoffset: calc(
+    1 - clamp(0, (var(--highlight-draw, 0) - 0.1) / 0.9, 1)
+  );
+}
+
+.about__highlight.is-revealed {
+  --highlight-draw: 1;
+}
+
+@media (min-width: 48rem) {
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "title title"
+      "stack content";
+    column-gap: clamp(2rem, 5vw, 5rem);
+    row-gap: 2rem;
+    align-items: start;
+    padding: 5rem 0 3rem;
+  }
+
+  .about__title {
+    grid-area: title;
+    font-size: clamp(4rem, 6vw, 5.625rem);
+  }
+
+  .about__stack {
+    grid-area: stack;
+  }
+
+  .about__stack-pin {
+    top: 6rem;
+  }
+
+  .about__stack-stage {
+    width: min(100%, 15.4rem);
+  }
+
+  .about__content {
+    grid-area: content;
+    align-self: center;
+    gap: 1.5rem;
+  }
+
+  .about__intro-heading {
+    font-size: clamp(2.75rem, 4vw, 4rem);
+  }
+
+  .about__paragraph {
+    font-size: 1.25rem;
+    max-width: 34rem;
+  }
+
+  .about__quote-text {
+    font-size: clamp(2.75rem, 4.5vw, 4.25rem);
+    max-width: 10em;
+  }
+
+  .about__highlight-mark {
+    width: 3.875em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about__photo {
+    opacity: 1;
+    transform: none;
+  }
+
+  .about__photo:not(.about__photo--2) {
+    display: none;
+  }
+
+  .about__stack-pin {
+    position: static;
+    padding: 0;
+  }
+
+  .about__stack-backdrop.is-switching {
+    animation: none;
+  }
+
+  .about__accent {
+    --accent-progress: 1;
+  }
+
+  .about__highlight {
+    --highlight-draw: 1;
+  }
+
+  .about__quote-line {
+    --line-progress: 1;
+    opacity: 1;
+    transform: none;
+  }
+}
