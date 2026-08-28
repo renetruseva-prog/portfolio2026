@@ -72,10 +72,18 @@
 }
 
 .expertise__rule {
+  --rule-progress: 0;
   max-width: 16rem;
   height: 1px;
   background-color: var(--color-text);
   opacity: 0.35;
+  transform: scaleX(var(--rule-progress));
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.expertise__rule.is-revealed {
+  --rule-progress: 1;
 }
 
 .expertise__skills {
@@ -137,5 +145,12 @@
 
   .expertise__skill-line {
     font-size: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expertise__rule {
+    --rule-progress: 1;
+    transform: none;
   }
 }

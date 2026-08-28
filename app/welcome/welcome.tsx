@@ -1,6 +1,7 @@
 import { AboutSection } from "~/components/home/AboutSection";
 import { EducationSection } from "~/components/home/EducationSection";
 import { ExpertiseSection } from "~/components/home/ExpertiseSection";
+import { FooterSection } from "~/components/home/FooterSection";
 import { HeroSection } from "~/components/home/HeroSection";
 import { LanguagesSection } from "~/components/home/LanguagesSection";
 import { WorksSection } from "~/components/home/WorksSection";
@@ -19,6 +20,7 @@ export function Welcome() {
         <LanguagesSection />
         <EducationSection />
       </main>
+      <FooterSection />
     </>
   );
 }

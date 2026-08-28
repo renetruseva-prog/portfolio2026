@@ -209,6 +209,37 @@ export const educationContent = {
   ],
 } as const satisfies { title: string; entries: EducationEntry[] };
 
+export const footerAssets = {
+  frame: "/images/portfolio/footer/frame.svg",
+  star: "/images/portfolio/footer/star.svg",
+  arrowUp: "/images/portfolio/arrow-up.svg",
+  arrowExternal: "/images/portfolio/arrow-external.svg",
+} as const;
+
+export const footerContent = {
+  heading: "Let's work together.",
+  headingHighlight: "work",
+  exploreTitle: "Explore",
+  contactTitle: "Contacts",
+  exploreLinks: [
+    { label: "Home", href: "/" },
+    { label: "Works", href: "#works" },
+    { label: "About", href: "#about" },
+  ],
+  contactLinks: [
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/renet-ruseva-3089682b9/",
+    },
+    { label: "Github", href: "https://github.com/renetruseva-prog" },
+    { label: "Behance", href: "https://www.behance.net/renetruseva" },
+    { label: "Email", href: "mailto:renetruseva@gmail.com" },
+    { label: "Download CV", href: "/cv/renet-ruseva-cv.pdf" },
+  ],
+  backToTop: "Back to top",
+  copyright: "© Copyright Renet Ruseva 2026",
+} as const;
+
 export const worksProjects: WorkProject[] = [
   {
     id: "beauty-of-transgression",

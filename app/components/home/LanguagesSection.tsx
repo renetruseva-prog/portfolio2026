@@ -1,9 +1,22 @@
+import { useEffect, useRef } from "react";
+
 import { languagesContent } from "~/content/site";
+import { initLanguagesWiggle } from "~/lib/languages-wiggle.client";
 import "./languages-section.css";
 
 export function LanguagesSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    return initLanguagesWiggle(section);
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="languages"
       className="languages"
       aria-labelledby="languages-title"
