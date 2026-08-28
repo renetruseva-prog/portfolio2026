@@ -15,6 +15,10 @@ export const site = {
     label: "See my projects",
     href: "#works",
   },
+  cv: {
+    label: "Download my CV",
+    href: "/cv/renet-ruseva-cv.pdf",
+  },
 } as const;
 
 export const heroAssets = {
@@ -74,6 +78,94 @@ export const worksAssets = {
   arrowLeft: "/images/portfolio/arrow-left.svg",
   arrowRight: "/images/portfolio/arrow-right.svg",
 } as const;
+
+export type AboutPhoto = {
+  id: string;
+  src: string;
+  alt: string;
+  caption: readonly string[];
+  captionPosition: "top-left" | "bottom-left";
+};
+
+export const aboutAssets = {
+  photos: [
+    {
+      id: "belgium-winter",
+      src: "/images/portfolio/about-me/photo1.png",
+      alt: "Renet on a snowy rooftop during her first winter in Belgium",
+      caption: ["first winter", "in Belgium"],
+      captionPosition: "top-left",
+    },
+    {
+      id: "bratislava-trip",
+      src: "/images/portfolio/about-me/photo2.png",
+      alt: "Renet visiting the Blue Church in Bratislava",
+      caption: ["trip to", "Bratislava"],
+      captionPosition: "bottom-left",
+    },
+    {
+      id: "future-coworker",
+      src: "/images/portfolio/about-me/photo3.png",
+      alt: "Renet standing next to a humanoid robot",
+      caption: ["meeting a future", "co-worker??"],
+      captionPosition: "top-left",
+    },
+  ],
+  cvArrow: "/images/portfolio/arrow-external.svg",
+  highlight: "/images/portfolio/about-me/highlight.svg",
+} as const satisfies { photos: AboutPhoto[]; cvArrow: string; highlight: string };
+
+export const aboutContent = {
+  introHeading: "In short,",
+  paragraphs: [
+    {
+      text: "I'm a ",
+      accent: "digital design student and creative developer",
+      strong: " based in Kortrijk, Belgium.",
+      rest: " I'm interested in the space between design, technology and user interaction. I like taking messy ideas, figuring out what actually matters, and turning them into experiences that feel both inspiring, authentic and intuitive.",
+    },
+    {
+      text: "When I'm not creating (which is, khem, rarely), you can find me crocheting, reading, collaging, DIY-ing, travelling around or just exploring different small cafes with my friends :)",
+    },
+  ],
+  quote: {
+    text: "I like complicated problems —\nbecause I\nlike solving them.",
+    highlight: "solving",
+  },
+} as const;
+
+export type ExpertiseArea = {
+  id: string;
+  index: string;
+  title: string;
+  skillLines: readonly (readonly string[])[];
+};
+
+export const expertiseContent = {
+  title: "My expertise",
+  areas: [
+    {
+      id: "visual-design",
+      index: "01",
+      title: "Visual Design + UX/UI",
+      skillLines: [
+        ["Figma", "Photoshop", "Miro"],
+        ["Illustrator", "After Effects"],
+        ["Prototyping"],
+      ],
+    },
+    {
+      id: "web-development",
+      index: "02",
+      title: "Web Development",
+      skillLines: [
+        ["Html", "Css", "JavaScript"],
+        ["ml5.js", "MySQL", "React"],
+        ["React Router", "GSAP", "Git"],
+      ],
+    },
+  ],
+} as const satisfies { title: string; areas: ExpertiseArea[] };
 
 export const worksProjects: WorkProject[] = [
   {
