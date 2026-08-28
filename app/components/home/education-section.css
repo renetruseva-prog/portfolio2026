@@ -1,0 +1,150 @@
+.education {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 0 0 4rem;
+}
+
+.education__title {
+  margin: 0;
+  font-size: 1.875rem;
+  line-height: 0.95;
+  text-transform: none;
+}
+
+.education__list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 19rem;
+}
+
+.education__list::before {
+  content: "";
+  position: absolute;
+  top: 0.4375rem;
+  bottom: 0.4375rem;
+  left: 0.4375rem;
+  border-left: 1px dashed var(--color-text);
+  opacity: 0.9;
+  transform: translateX(-50%);
+}
+
+.education__item {
+  display: grid;
+  grid-template-columns: 0.875rem minmax(0, 1fr);
+  column-gap: 1rem;
+  align-items: start;
+}
+
+.education__item:not(:last-child) {
+  padding-bottom: 1rem;
+}
+
+.education__marker {
+  position: relative;
+  z-index: 1;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: 0.125rem;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.education__item--location .education__marker {
+  margin-top: 0.0625rem;
+}
+
+.education__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.education__period {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.education__institution {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+.education__program {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+.education__location {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: #B9B9B9;
+}
+
+@media (min-width: 48rem) {
+  .education {
+    gap: 2.5rem;
+    padding-bottom: 6rem;
+  }
+
+  .education__title {
+    font-size: clamp(4rem, 6vw, 5.625rem);
+  }
+
+  .education__list {
+    max-width: 40rem;
+  }
+
+  .education__list::before {
+    left: 0.5rem;
+  }
+
+  .education__item {
+    grid-template-columns: 1rem minmax(0, 1fr);
+    column-gap: 1.25rem;
+  }
+
+  .education__item:not(:last-child) {
+    padding-bottom: 3.25rem;
+  }
+
+  .education__marker {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.1875rem;
+  }
+
+  .education__period {
+    font-size: 1.125rem;
+  }
+
+  .education__institution,
+  .education__program {
+    font-size: 1.25rem;
+  }
+
+  .education__location {
+    font-size: 1.125rem;
+  }
+}
