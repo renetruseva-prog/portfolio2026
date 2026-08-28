@@ -1,11 +1,22 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 
 import { expertiseContent } from "~/content/site";
+import { initExpertiseMotion } from "~/lib/section-scroll-motion.client";
 import "./expertise-section.css";
 
 export function ExpertiseSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    return initExpertiseMotion(section);
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="expertise"
       className="expertise"
       aria-labelledby="expertise-title"

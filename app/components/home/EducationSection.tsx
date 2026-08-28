@@ -1,13 +1,23 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 
 import { educationContent } from "~/content/site";
+import { initEducationMotion } from "~/lib/section-scroll-motion.client";
 import "./education-section.css";
 
 export function EducationSection() {
+  const sectionRef = useRef<HTMLElement>(null);
   const lastIndex = educationContent.entries.length - 1;
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    return initEducationMotion(section);
+  }, []);
 
   return (
     <section
+      ref={sectionRef}
       id="education"
       className="education"
       aria-labelledby="education-title"
@@ -16,7 +26,10 @@ export function EducationSection() {
         {educationContent.title}
       </h2>
 
-      <ol className="education__list">
+      <div className="education__timeline">
+        <div className="education__timeline-line" aria-hidden="true" />
+
+        <ol className="education__list">
         {educationContent.entries.map((entry, index) => {
           const isLast = index === lastIndex;
 
@@ -46,7 +59,8 @@ export function EducationSection() {
             </Fragment>
           );
         })}
-      </ol>
+        </ol>
+      </div>
     </section>
   );
 }
