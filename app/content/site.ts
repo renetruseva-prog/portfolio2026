@@ -167,6 +167,48 @@ export const expertiseContent = {
   ],
 } as const satisfies { title: string; areas: ExpertiseArea[] };
 
+export type LanguageItem = {
+  id: string;
+  name: string;
+  level: string;
+};
+
+export const languagesContent = {
+  title: "Languages",
+  items: [
+    { id: "bulgarian", name: "Bulgarian", level: "Native" },
+    { id: "english", name: "English", level: "Fluent" },
+    { id: "russian", name: "Russian", level: "Fluent" },
+  ],
+} as const satisfies { title: string; items: LanguageItem[] };
+
+export type EducationEntry = {
+  id: string;
+  period: string;
+  institution: string;
+  program?: string;
+  location: string;
+};
+
+export const educationContent = {
+  title: "Education",
+  entries: [
+    {
+      id: "devine",
+      period: "Sep 2024 - Ongoing",
+      institution: "Devine - KASK Howest",
+      program: "Digital Design and Development",
+      location: "Kortrijk, Belgium",
+    },
+    {
+      id: "high-school",
+      period: "Sep 2018 - May 2023",
+      institution: 'High School of Mathematics "Dr Petar Beron"',
+      location: "Varna, Bulgaria",
+    },
+  ],
+} as const satisfies { title: string; entries: EducationEntry[] };
+
 export const worksProjects: WorkProject[] = [
   {
     id: "beauty-of-transgression",

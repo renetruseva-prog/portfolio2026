@@ -2,11 +2,11 @@
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  padding: 2.5rem 0 4rem;
+  padding: 2.5rem 0 4.75rem;
 }
 
 .expertise__title {
-  margin: 0;
+  margin: 0 0 1rem 0;
   font-size: 1.875rem;
   line-height: 0.95;
   text-transform: none;
@@ -24,7 +24,6 @@
 .expertise__item {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .expertise__lead {
@@ -48,9 +47,9 @@
 
 .expertise__index-label {
   transform: rotate(-45deg);
-  font-family: var(--font-ui);
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 400;
   line-height: 1;
   color: var(--color-text);
 }
@@ -60,10 +59,11 @@
   flex-direction: column;
   gap: 0.625rem;
   min-width: 0;
+  margin-left: -0.5rem;
 }
 
 .expertise__area-title {
-  margin: 0;
+  margin: 0 0 0 2rem;
   font-family: var(--font-body);
   font-size: 1.125rem;
   font-weight: 700;
@@ -72,7 +72,7 @@
 }
 
 .expertise__rule {
-  width: 100%;
+  max-width: 16rem;
   height: 1px;
   background-color: var(--color-text);
   opacity: 0.35;
@@ -82,7 +82,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
-  margin: 0;
+  margin: 0 0 0 2rem;
   padding: 0 0 0 calc(2.625rem + 1rem);
   list-style: none;
 }
