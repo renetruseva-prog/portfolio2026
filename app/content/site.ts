@@ -3,9 +3,9 @@ export const site = {
   tagline: "Hello, I am",
   bio: "I am a creative developer who likes to combine visual storytelling with the power of web technology.",
   nav: [
-    { label: "Works", href: "#works" },
-    { label: "About", href: "#about" },
-    { label: "Contact me", href: "#contact" },
+    { label: "Works", href: "/#works" },
+    { label: "About", href: "/#about" },
+    { label: "Contact me", href: "/#contact" },
   ],
   languages: {
     current: "ENG",
@@ -13,7 +13,7 @@ export const site = {
   },
   cta: {
     label: "See my projects",
-    href: "#works",
+    href: "/#works",
   },
   cv: {
     label: "Download my CV",
@@ -223,8 +223,8 @@ export const footerContent = {
   contactTitle: "Contacts",
   exploreLinks: [
     { label: "Home", href: "/" },
-    { label: "Works", href: "#works" },
-    { label: "About", href: "#about" },
+    { label: "Works", href: "/#works" },
+    { label: "About", href: "/#about" },
   ],
   contactLinks: [
     {
@@ -242,31 +242,31 @@ export const footerContent = {
 
 export const worksProjects: WorkProject[] = [
   {
-    id: "beauty-of-transgression",
+    id: "project1",
     title: "The beauty of transgression",
     tags: ["Creative Code", "Design", "UI/UX"],
-    href: "#",
+    href: "/works/project1",
     ctaLabel: "See more",
   },
   {
-    id: "memome",
+    id: "project2",
     title: "Memome - Discover Antwerp",
     tags: ["Creative Code", "UI/UX", "Teamwork"],
-    href: "#",
+    href: "/works/project2",
     ctaLabel: "See more",
   },
   {
-    id: "webrtc-presenter",
+    id: "project3",
     title: "Phone to desktop presenter with WebRTC",
     tags: ["Creative Code", "WebRTC", "Socket.IO"],
-    href: "#",
+    href: "/works/project3",
     ctaLabel: "See more",
   },
   {
-    id: "miles-and-meals",
+    id: "project4",
     title: "Miles and Meals",
     tags: ["Branding", "Design", "UI/UX"],
-    href: "#",
+    href: "/works/project4",
     ctaLabel: "See more",
   },
 ];

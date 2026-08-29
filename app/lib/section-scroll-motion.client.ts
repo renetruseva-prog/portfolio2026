@@ -48,6 +48,11 @@ function bindScrollMotion(
   document.addEventListener("touchmove", scheduleUpdate, { passive: true, capture: true });
   window.addEventListener("scroll", scheduleUpdate, { passive: true, capture: true });
   window.addEventListener("resize", scheduleUpdate, { passive: true });
+  window.addEventListener("orientationchange", scheduleUpdate, { passive: true });
+  document.documentElement.addEventListener("scroll", scheduleUpdate, {
+    passive: true,
+    capture: true,
+  });
   window.visualViewport?.addEventListener("scroll", scheduleUpdate, { passive: true });
   window.visualViewport?.addEventListener("resize", scheduleUpdate, { passive: true });
 
@@ -58,6 +63,8 @@ function bindScrollMotion(
     document.removeEventListener("touchmove", scheduleUpdate, true);
     window.removeEventListener("scroll", scheduleUpdate, true);
     window.removeEventListener("resize", scheduleUpdate);
+    window.removeEventListener("orientationchange", scheduleUpdate);
+    document.documentElement.removeEventListener("scroll", scheduleUpdate, true);
     window.visualViewport?.removeEventListener("scroll", scheduleUpdate);
     window.visualViewport?.removeEventListener("resize", scheduleUpdate);
   };
@@ -226,5 +233,51 @@ export function initFooterMotion(section: HTMLElement) {
     cleanupScroll();
     frame.style.removeProperty("--frame-progress");
     frame.classList.remove("is-revealed");
+  };
+}
+
+export function initProjectPageMotion(root: HTMLElement) {
+  const drawElements = Array.from(
+    root.querySelectorAll<HTMLElement>(".project-divider, .project-tags__squiggle"),
+  );
+
+  if (drawElements.length === 0) {
+    return () => {};
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const update = () => {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    for (const element of drawElements) {
+      const progress = reducedMotion
+        ? 1
+        : easeOutCubic(getRevealProgress(element, viewportHeight));
+
+      element.style.setProperty("--draw-progress", String(progress));
+      element.classList.toggle("is-revealed", progress >= 1);
+    }
+  };
+
+  const cleanupScroll = bindScrollMotion(update, reducedMotion);
+
+  const observer = new IntersectionObserver(
+    () => update(),
+    { threshold: [0, 0.25, 0.5, 0.75, 1] },
+  );
+
+  for (const element of drawElements) {
+    observer.observe(element);
+  }
+
+  return () => {
+    cleanupScroll();
+    observer.disconnect();
+
+    for (const element of drawElements) {
+      element.style.removeProperty("--draw-progress");
+      element.classList.remove("is-revealed");
+    }
   };
 }
