@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
+import { Link } from "react-router";
 
 import { worksAssets, worksProjects } from "~/content/site";
 import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
@@ -314,9 +315,9 @@ export function WorksSection() {
                       ))}
                     </p>
 
-                    <a href={project.href} className="works__cta">
+                    <Link to={project.href} className="works__cta">
                       {project.ctaLabel}
-                    </a>
+                    </Link>
                   </div>
                 ))}
               </div>
