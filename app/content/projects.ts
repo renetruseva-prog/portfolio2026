@@ -13,7 +13,13 @@ export type ProjectImage = {
 
 export type ProjectScreenshotRow =
   | { type: "pair"; images: readonly [ProjectImage, ProjectImage] }
+  | { type: "triple"; images: readonly [ProjectImage, ProjectImage, ProjectImage] }
   | { type: "full"; image: ProjectImage };
+
+export type ProjectToolkitGroup = {
+  label: string;
+  items: readonly string[];
+};
 
 export type ProjectCaseStudy = {
   titleLead: string;
@@ -21,15 +27,16 @@ export type ProjectCaseStudy = {
   summary: string;
   links: {
     website?: ProjectLink;
+    github?: ProjectLink;
     process?: ProjectLink;
   };
-  toolkit: {
-    design: readonly string[];
-    code: readonly string[];
-  };
-  goals: readonly string[];
+  toolkit: readonly ProjectToolkitGroup[];
   screenshotRows: readonly ProjectScreenshotRow[];
-  process: {
+  description?: string;
+  role?: readonly string[];
+  goals?: readonly string[];
+  features?: readonly string[];
+  process?: {
     step: string;
     image: ProjectImage;
   };
@@ -74,6 +81,18 @@ export type ProjectDetail = {
   blocks?: readonly ProjectBlock[];
 };
 
+const memomeAssets = {
+  hero: "/images/portfolio/project2/project2_thumbnail.png",
+  heroVideo: "/images/portfolio/project2/integration4.mp4",
+  screenshot1: "/images/portfolio/project2/screenshot1.png",
+  screenshot2: "/images/portfolio/project2/screenshot2.png",
+  screenshot3: "/images/portfolio/project2/screenshot3.png",
+  screenshot4: "/images/portfolio/project2/screenshot4.png",
+  screenshot5: "/images/portfolio/project2/screenshot5.png",
+  screenshot6: "/images/portfolio/project2/screenshot6.png",
+  screenshot7: "/images/portfolio/project2/screenshot7.png",
+} as const;
+
 const transgressionAssets = {
   hero: "/images/portfolio/project1/project1_thumbnail.png",
   heroVideo: "/images/portfolio/project1/project1.mp4",
@@ -110,10 +129,10 @@ export const projectDetails: ProjectDetail[] = [
         },
         process: { href: "https://www.figma.com/design/qerL19stCKf9t1ba7YrAXx/Integration3_RenetRuseva?node-id=1211-1553&p=f&t=GaxKSRsOdJtGoMQf-0", label: "Link to process" },
       },
-      toolkit: {
-        design: ["Figma", "Photoshop"],
-        code: ["Html", "Css", "JavaScript", "GSAP"],
-      },
+      toolkit: [
+        { label: "Design", items: ["Figma", "Photoshop"] },
+        { label: "Code", items: ["Html", "Css", "JavaScript", "GSAP"] },
+      ],
       goals: [
         "focus on interactivity",
         "micro-animations",
@@ -176,49 +195,117 @@ export const projectDetails: ProjectDetail[] = [
     title: "Memome - Discover Antwerp",
     shortTitle: "MemoMe app",
     tags: ["Creative Code", "UI/UX", "Teamwork"],
-    accentColor: worksSlideCircleColors[1],
+    accentColor: "#D00E0E",
     hero: {
-      src: worksAssets.slide2.phone,
-      alt: "Memome mobile app mockup",
+      src: memomeAssets.hero,
+      alt: "MemoMe interactive map of Antwerp with memory pins and category filters",
+      video: memomeAssets.heroVideo,
     },
-    blocks: [
-      {
-        id: "intro",
-        type: "intro",
-        paragraphs: [
-          "Memome is a mobile-first experience that helps visitors discover Antwerp through curated routes, local stories, and playful interactions.",
-        ],
-      },
-      {
-        id: "hero-grid",
-        type: "image",
-        src: worksAssets.slide2.greenGrid,
-        alt: "Green grid background from Memome branding",
-        fullBleed: true,
-      },
-      {
-        id: "challenge",
-        type: "text",
-        title: "Challenge",
-        paragraphs: [
-          "We needed to translate a dense city guide into something intuitive for tourists while keeping the personality of Antwerp visible throughout the interface.",
-        ],
-      },
-      {
-        id: "solution",
-        type: "split",
-        title: "Solution",
-        imagePosition: "left",
-        image: {
-          src: worksAssets.slide2.hand,
-          alt: "Hand illustration from Memome",
+    caseStudy: {
+      titleLead: "MemoMe app -",
+      titleAccent: "Interactive map",
+      summary:
+        "For this project my team and I had to explore a strategy of encouraging young people (18-36) to choose Antwerp for a multi-day city trip. The result is MemoMe, a location-based web app where visitors pin memories on a map, collect digital stickers via QR codes, and build a shareable travel diary to document their trips.",
+      links: {
+        website: {
+          href: "https://memomeantwerp.vercel.app/",
+          label: "Link to website",
         },
-        paragraphs: [
-          "We structured the app around memorable moments rather than categories, using bold typography and a modular card system.",
-          "Prototypes were tested early to validate navigation and content hierarchy before development.",
-        ],
+        github: {
+          href: "https://github.com/renetruseva-prog",
+          label: "Link to github",
+        },
+        process: {
+          href: "https://www.figma.com/design/PZGhPbu9SVBInJ0sB02aVw/Portfolio?node-id=324-5783",
+          label: "Link to process",
+        },
       },
-    ],
+      toolkit: [
+        { label: "UX/UI", items: ["Figma", "Miro", "Interviews"] },
+        {
+          label: "Code",
+          items: [
+            "JavaScript",
+            "Css",
+            "React",
+            "React Router v7",
+            "GSAP",
+            "Supabase",
+            "Leaflet",
+            "Mobile-first",
+          ],
+        },
+      ],
+      screenshotRows: [
+        {
+          type: "pair",
+          images: [
+            {
+              src: memomeAssets.screenshot1,
+              alt: "MemoMe map popup with a fashion memory pin",
+            },
+            {
+              src: memomeAssets.screenshot2,
+              alt: "MemoMe map popup for a music event",
+            },
+          ],
+        },
+        {
+          type: "triple",
+          images: [
+            {
+              src: memomeAssets.screenshot3,
+              alt: "MemoMe add memo screen with media upload",
+            },
+            {
+              src: memomeAssets.screenshot4,
+              alt: "MemoMe profile with memos, favorites, and stickers",
+            },
+            {
+              src: memomeAssets.screenshot5,
+              alt: "MemoMe sticker achievements collection",
+            },
+          ],
+        },
+        {
+          type: "full",
+          image: {
+            src: memomeAssets.screenshot6,
+            alt: "MemoMe map with settings panel and location pins",
+          },
+        },
+        {
+          type: "full",
+          image: {
+            src: memomeAssets.screenshot7,
+            alt: "MemoMe landing screen with create account call to action",
+          },
+        },
+      ],
+      description:
+        "MemoMe turns a city visit into a personal souvenir. Users drop memory pins on the map of Antwerp, discover places and events, scan physical QR stickers to unlock collectibles, and flip through a travel diary they can decorate and share.",
+      role: ["Lead developer", "UX/UI researcher", "Proactive teammate"],
+      goals: [
+        "have physical and digital engagement",
+        "add mapping integration",
+        "use latest React patterns",
+        "follow a CI/CD pipeline",
+      ],
+      features: [
+        "Map-based memory pinning",
+        "Memo CRUD with media upload",
+        "Location search & geocoding",
+        "Authentication (guest + registered)",
+        "Discover section (events, places, search)",
+        "Favourites & user collections",
+        "Travel journals with page navigation",
+        "Draggable sticker decoration",
+        "Scan QR codes → digital collectible rewards",
+        "Recap generation & social sharing",
+        "Account settings",
+        "GSAP integration",
+      ],
+    },
   },
   {
     slug: "project3",

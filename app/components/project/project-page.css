@@ -307,6 +307,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.project-gallery__row--triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .project-gallery__row--full {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -433,6 +437,11 @@
 
 .project-gallery__row--pair .project-gallery__image {
   aspect-ratio: 188 / 165;
+}
+
+.project-gallery__row--triple .project-gallery__image {
+  aspect-ratio: 119 / 236;
+  object-fit: cover;
 }
 
 .project-gallery__row--full .project-gallery__image {
@@ -690,6 +699,12 @@
   .project-gallery__row--pair .project-gallery__image {
     aspect-ratio: auto;
     min-height: 10rem;
+  }
+
+  .project-gallery__row--triple .project-gallery__image {
+    aspect-ratio: auto;
+    min-height: 14rem;
+    max-height: 24rem;
   }
 
   .project-gallery__row--full .project-gallery__image {
