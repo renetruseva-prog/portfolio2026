@@ -38,6 +38,22 @@ function ScreenshotRow({
     );
   }
 
+  if (row.type === "triple") {
+    return (
+      <li className="project-gallery__row project-gallery__row--triple">
+        {row.images.map((image) => (
+          <ExpandableImageTrigger
+            key={image.src}
+            image={image}
+            isRevealed={revealedSrc === image.src}
+            onReveal={() => onReveal(image.src)}
+            onOpen={() => onOpen(image)}
+          />
+        ))}
+      </li>
+    );
+  }
+
   return (
     <li className="project-gallery__row project-gallery__row--pair">
       {row.images.map((image) => (

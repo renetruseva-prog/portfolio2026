@@ -186,13 +186,22 @@ function CaseStudyPage({
               </h2>
               <p className="project-section__body">{caseStudy.summary}</p>
 
-              {(caseStudy.links.website || caseStudy.links.process) && (
+              {(caseStudy.links.website ||
+                caseStudy.links.github ||
+                caseStudy.links.process) && (
                 <div className="project-section__actions">
                   {caseStudy.links.website ? (
                     <ProjectLinkButton
                       href={caseStudy.links.website.href}
                       label={caseStudy.links.website.label}
                       variant="gold"
+                    />
+                  ) : null}
+                  {caseStudy.links.github ? (
+                    <ProjectLinkButton
+                      href={caseStudy.links.github.href}
+                      label={caseStudy.links.github.label}
+                      variant="cream"
                     />
                   ) : null}
                   {caseStudy.links.process ? (
@@ -235,14 +244,14 @@ function CaseStudyPage({
               </h2>
 
               <div className="project-toolkit">
-                <div className="project-toolkit__group">
-                  <h3 className="project-toolkit__label display-title">Design</h3>
-                  <TagList items={caseStudy.toolkit.design} />
-                </div>
-                <div className="project-toolkit__group">
-                  <h3 className="project-toolkit__label display-title">Code</h3>
-                  <TagList items={caseStudy.toolkit.code} />
-                </div>
+                {caseStudy.toolkit.map((group) => (
+                  <div key={group.label} className="project-toolkit__group">
+                    <h3 className="project-toolkit__label display-title">
+                      {group.label}
+                    </h3>
+                    <TagList items={group.items} />
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -261,42 +270,103 @@ function CaseStudyPage({
 
             <hr className="project-divider project-divider--standalone" />
 
-            <section
-              className="project-section"
-              aria-labelledby="project-goal-heading"
-            >
-              <h2
-                id="project-goal-heading"
-                className="project-section__title display-title"
+            {caseStudy.description ? (
+              <section
+                className="project-section"
+                aria-labelledby="project-description-heading"
               >
-                Goal
-              </h2>
-              <ul className="project-goals">
-                {caseStudy.goals.map((goal) => (
-                  <li key={goal} className="project-goals__item">
-                    {goal}
-                  </li>
-                ))}
-              </ul>
-            </section>
+                <h2
+                  id="project-description-heading"
+                  className="project-section__title display-title"
+                >
+                  Description
+                </h2>
+                <p className="project-section__body">{caseStudy.description}</p>
+              </section>
+            ) : null}
 
-            <section
-              className="project-section"
-              aria-labelledby="project-process-heading"
-            >
-              <h2
-                id="project-process-heading"
-                className="project-section__title display-title"
+            {caseStudy.role ? (
+              <section
+                className="project-section"
+                aria-labelledby="project-role-heading"
               >
-                Process
-              </h2>
-              <p className="project-process__step">{caseStudy.process.step}</p>
-              <ProjectExpandableImage
-                image={caseStudy.process.image}
-                figureClassName="project-process__figure project-gallery__figure"
-                imageClassName="project-process__image project-gallery__image"
-              />
-            </section>
+                <h2
+                  id="project-role-heading"
+                  className="project-section__title display-title"
+                >
+                  My role
+                </h2>
+                <ul className="project-goals">
+                  {caseStudy.role.map((item) => (
+                    <li key={item} className="project-goals__item">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {caseStudy.goals ? (
+              <section
+                className="project-section"
+                aria-labelledby="project-goal-heading"
+              >
+                <h2
+                  id="project-goal-heading"
+                  className="project-section__title display-title"
+                >
+                  Goal
+                </h2>
+                <ul className="project-goals">
+                  {caseStudy.goals.map((goal) => (
+                    <li key={goal} className="project-goals__item">
+                      {goal}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {caseStudy.features ? (
+              <section
+                className="project-section"
+                aria-labelledby="project-features-heading"
+              >
+                <h2
+                  id="project-features-heading"
+                  className="project-section__title display-title"
+                >
+                  Features
+                </h2>
+                <ul className="project-goals">
+                  {caseStudy.features.map((feature) => (
+                    <li key={feature} className="project-goals__item">
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {caseStudy.process ? (
+              <section
+                className="project-section"
+                aria-labelledby="project-process-heading"
+              >
+                <h2
+                  id="project-process-heading"
+                  className="project-section__title display-title"
+                >
+                  Process
+                </h2>
+                <p className="project-process__step">{caseStudy.process.step}</p>
+                <ProjectExpandableImage
+                  image={caseStudy.process.image}
+                  figureClassName="project-process__figure project-gallery__figure"
+                  imageClassName="project-process__image project-gallery__image"
+                />
+              </section>
+            ) : null}
 
             {prevProject || nextProject ? (
               <nav
