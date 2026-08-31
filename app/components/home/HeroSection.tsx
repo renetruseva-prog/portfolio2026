@@ -97,6 +97,11 @@ export function HeroSection() {
   const [isOrbitAnimating, setIsOrbitAnimating] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const coreGridRef = useRef<HTMLDivElement>(null);
+  const collageRef = useRef<HTMLDivElement>(null);
+  const rusevaAnchorRef = useRef<HTMLSpanElement>(null);
+  const rusevaCollageRef = useRef<HTMLParagraphElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+  const starRef = useRef<HTMLImageElement>(null);
   const orbitStepRef = useRef(0);
   const itemRefs = useRef<Map<string, HTMLImageElement>>(new Map);
   const cancelAnimationRef = useRef<(() => void) | null>(null);
@@ -169,6 +174,116 @@ export function HeroSection() {
     };
   }, []);
 
+  useEffect(() => {
+    const layout = window.matchMedia("(min-width: 30rem)");
+    const copyBelowRuseva = window.matchMedia("(min-width: 30rem) and (max-width: 1179px)");
+    const hero = collageRef.current?.closest(".hero");
+
+    const syncRusevaLayout = () => {
+      const anchor = rusevaAnchorRef.current;
+      const ruseva = rusevaCollageRef.current;
+      const star = starRef.current;
+      const copy = copyRef.current;
+      const collage = collageRef.current;
+      const renet = anchor?.closest(".hero__title-line--renet");
+
+      if (!layout.matches || !anchor || !ruseva || !collage || !renet) {
+        ruseva?.style.removeProperty("left");
+        ruseva?.style.removeProperty("top");
+        ruseva?.style.removeProperty("transform");
+        star?.style.removeProperty("left");
+        star?.style.removeProperty("top");
+        star?.style.removeProperty("transform");
+        copy?.style.removeProperty("margin-top");
+        copy?.style.removeProperty("margin-left");
+        return;
+      }
+
+      const anchorRect = anchor.getBoundingClientRect();
+      const renetRect = renet.getBoundingClientRect();
+      const coreGrid = coreGridRef.current;
+      const positionRoot = coreGrid ?? collage;
+      const rootRect = positionRoot.getBoundingClientRect();
+      const heroEl = hero instanceof HTMLElement ? hero : null;
+      const heroStyles = heroEl ? getComputedStyle(heroEl) : getComputedStyle(document.documentElement);
+      const remPx = parseFloat(heroStyles.fontSize);
+      const cssRem = (name: string, fallbackRem: number) => {
+        const raw = heroStyles.getPropertyValue(name).trim();
+        return raw.endsWith("rem") ? parseFloat(raw) * remPx : fallbackRem * remPx;
+      };
+      const rusevaGap = cssRem("--hero-name-line-gap", 3);
+      const copyOffset = cssRem("--hero-copy-offset", 3);
+      const rusevaLiftRatio =
+        parseFloat(heroStyles.getPropertyValue("--hero-ruseva-lift")) || 0.3;
+      const rusevaLift = ruseva.offsetHeight * rusevaLiftRatio;
+      const rusevaLeft = anchorRect.left - rootRect.left;
+      const rusevaTop = renetRect.bottom - rootRect.top + rusevaGap - rusevaLift;
+
+      ruseva.style.left = `${rusevaLeft}px`;
+      ruseva.style.top = `${rusevaTop}px`;
+      ruseva.style.transform = "none";
+
+      if (star) {
+        const starGap = cssRem("--hero-star-gap", 2);
+        const starCenterX =
+          rusevaLeft +
+          cssRem("--hero-star-x", 3.27) +
+          cssRem("--hero-star-x-offset", 0) +
+          cssRem("--hero-star-x-nudge", 0);
+        const starWidth = star.offsetWidth;
+        const starHeight = star.offsetHeight;
+        star.style.left = `${starCenterX - starWidth / 2}px`;
+        star.style.top = `${rusevaTop - starHeight - starGap}px`;
+        star.style.transform = "none";
+      }
+
+      if (copy) {
+        copy.style.marginTop = "0";
+        copy.style.marginLeft = "0";
+        const copyRect = copy.getBoundingClientRect();
+
+        if (copyBelowRuseva.matches) {
+          const rusevaRect = ruseva.getBoundingClientRect();
+          const copyGap = cssRem("--hero-copy-below-ruseva-gap", 1);
+          copy.style.marginTop = `${rusevaRect.bottom - copyRect.top + copyGap}px`;
+          copy.style.marginLeft = `${rusevaRect.left - copyRect.left}px`;
+        } else {
+          copy.style.removeProperty("margin-left");
+          const copyLiftRatio =
+            parseFloat(heroStyles.getPropertyValue("--hero-copy-lift")) || 0.7;
+          const copyLift = copyRect.height * copyLiftRatio;
+          copy.style.marginTop = `${renetRect.bottom - copyRect.top + copyOffset - copyLift}px`;
+        }
+      }
+    };
+
+    syncRusevaLayout();
+
+    const intro = hero?.querySelector(".hero__intro");
+    const observer = hero ? new ResizeObserver(syncRusevaLayout) : null;
+    if (hero) {
+      observer?.observe(hero);
+    }
+    if (collageRef.current) {
+      observer?.observe(collageRef.current);
+    }
+    if (intro instanceof HTMLElement) {
+      observer?.observe(intro);
+    }
+
+    window.addEventListener("resize", syncRusevaLayout);
+    layout.addEventListener("change", syncRusevaLayout);
+    copyBelowRuseva.addEventListener("change", syncRusevaLayout);
+    document.fonts?.ready.then(syncRusevaLayout);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", syncRusevaLayout);
+      layout.removeEventListener("change", syncRusevaLayout);
+      copyBelowRuseva.removeEventListener("change", syncRusevaLayout);
+    };
+  }, []);
+
   const featuredItem = getFeaturedOrbitItem(ORBIT_ITEMS, displayStep);
   const noteLabel = featuredItem
     ? ORBIT_NOTE_BY_TYPE[featuredItem.type]
@@ -177,28 +292,34 @@ export function HeroSection() {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__content">
-        <p className="hero__tagline display-title">{site.tagline}</p>
+        <div className="hero__intro">
+          <p className="hero__tagline display-title">{site.tagline}</p>
 
-        <h1 id="hero-title" className="hero__title display-title">
-          <span className="hero__title-line hero__title-line--renet">Renet</span>{" "}
-          <span className="hero__title-line hero__title-line--offset">Ruseva</span>
-        </h1>
+          <h1 id="hero-title" className="hero__title display-title">
+            <span className="hero__title-line hero__title-line--renet">
+              Ren<span className="hero__title-ruseva-anchor" ref={rusevaAnchorRef}>e</span>t
+            </span>{" "}
+            <span className="hero__title-line hero__title-line--offset">Ruseva</span>
+          </h1>
+        </div>
 
-        <p className="hero__bio">{site.bio}</p>
+        <div className="hero__copy" ref={copyRef}>
+          <p className="hero__bio">{site.bio}</p>
 
-        <a href={site.cta.href} className="hero__cta">
-          {site.cta.label}
-          <img
-            className="hero__cta-arrow"
-            src={heroAssets.ctaArrow}
-            alt=""
-            width={30}
-            height={20}
-          />
-        </a>
+          <a href={site.cta.href} className="hero__cta">
+            {site.cta.label}
+            <img
+              className="hero__cta-arrow"
+              src={heroAssets.ctaArrow}
+              alt=""
+              width={30}
+              height={20}
+            />
+          </a>
+        </div>
       </div>
 
-      <div className="hero__collage" aria-hidden="true">
+      <div className="hero__collage" aria-hidden="true" ref={collageRef}>
         <div className="hero__grid hero__grid--core" ref={coreGridRef}>
           <img
             className="hero__item hero__item--circle"
@@ -213,6 +334,21 @@ export function HeroSection() {
             alt=""
             width={327}
             height={435}
+          />
+          <p
+            ref={rusevaCollageRef}
+            className="hero__title-line hero__title-line--collage display-title"
+            aria-hidden="true"
+          >
+            Ruseva
+          </p>
+          <img
+            ref={starRef}
+            className="hero__title-star"
+            src={heroAssets.star}
+            alt=""
+            width={36}
+            height={36}
           />
           <img
             className="hero__item hero__item--hand"

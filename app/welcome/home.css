@@ -1,0 +1,33 @@
+.home-details {
+  display: contents;
+}
+
+@media (min-width: 30rem) {
+  .home-details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(2rem, 4vw, 4.5rem);
+    align-items: start;
+    padding: 0 0 6rem;
+  }
+
+  .home-details .expertise,
+  .home-details .languages,
+  .home-details .education {
+    min-width: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .home-details .expertise {
+    padding-bottom: 0;
+  }
+
+  .home-details .languages__tags {
+    align-items: flex-start;
+  }
+
+  .home-details .education__list {
+    max-width: none;
+  }
+}

@@ -4,10 +4,8 @@ import { useLayoutEffect, useRef } from "react";
 import { FooterSection } from "~/components/home/FooterSection";
 import { SiteHeader } from "~/components/layout/SiteHeader";
 import { ProjectHeroMedia } from "./ProjectHeroMedia";
-import {
-  ProjectExpandableImage,
-  ProjectScreenshotGallery,
-} from "./ProjectScreenshotGallery";
+import { ProjectExpandableImage } from "./ProjectExpandableImage";
+import { ProjectScreenshotGallery } from "./ProjectScreenshotGallery";
 import type {
   ProjectCaseStudy,
   ProjectDetail,

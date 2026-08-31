@@ -148,7 +148,7 @@
   animation: languages-tag-wiggle-russian 0.55s ease-in-out;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 30rem) {
   .languages {
     gap: 2.5rem;
     padding: 3rem 0 5rem;

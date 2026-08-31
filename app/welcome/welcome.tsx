@@ -6,6 +6,7 @@ import { HeroSection } from "~/components/home/HeroSection";
 import { LanguagesSection } from "~/components/home/LanguagesSection";
 import { WorksSection } from "~/components/home/WorksSection";
 import { SiteHeader } from "~/components/layout/SiteHeader";
+import "./home.css";
 
 export function Welcome() {
   return (
@@ -16,9 +17,11 @@ export function Welcome() {
         <WorksSection />
         <AboutSection />
         <div className="home-section-divider" aria-hidden="true" />
-        <ExpertiseSection />
-        <LanguagesSection />
-        <EducationSection />
+        <div className="home-details">
+          <ExpertiseSection />
+          <LanguagesSection />
+          <EducationSection />
+        </div>
       </main>
       <FooterSection />
     </>

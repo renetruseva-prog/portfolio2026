@@ -72,6 +72,18 @@ export function SiteHeader() {
           />
         </a>
 
+        <nav aria-label="Main" className="site-header__desktop-nav">
+          <ul className="site-header__desktop-nav-list">
+            {site.nav.map((link) => (
+              <li key={link.href}>
+                <a href={link.href} className="site-header__desktop-nav-link">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         <div className="site-header__actions">
           <button
             type="button"
@@ -95,7 +107,11 @@ export function SiteHeader() {
             className="site-header__lang-button"
             aria-label={`Switch to ${site.languages.alternate}`}
           >
-            {site.languages.current}
+            <span className="site-header__lang-current">{site.languages.current}</span>
+            <span className="site-header__lang-separator" aria-hidden="true">
+              /
+            </span>
+            <span className="site-header__lang-alternate">{site.languages.alternate}</span>
           </button>
         </div>
       </div>

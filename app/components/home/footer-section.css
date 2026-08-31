@@ -165,7 +165,7 @@
   font-weight: 700;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 30rem) {
   .footer__decorative-line {
     width: calc(100% + 4rem);
     margin: -2rem -2rem -0.75rem;

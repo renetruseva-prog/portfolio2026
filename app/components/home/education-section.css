@@ -128,7 +128,7 @@
   color: #B9B9B9;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 30rem) {
   .education {
     gap: 2.5rem;
     padding-bottom: 6rem;

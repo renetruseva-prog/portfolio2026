@@ -164,13 +164,13 @@ export function AboutSection() {
             draggable={false}
           />
         </a>
-
-        <blockquote className="about__quote">
-          <p className="about__quote-text display-title">
-            {renderQuote(aboutContent.quote.text, aboutContent.quote.highlight, highlightMaskId)}
-          </p>
-        </blockquote>
       </div>
+
+      <blockquote className="about__quote">
+        <p className="about__quote-text display-title">
+          {renderQuote(aboutContent.quote.text, aboutContent.quote.highlight, highlightMaskId)}
+        </p>
+      </blockquote>
     </section>
   );
 }

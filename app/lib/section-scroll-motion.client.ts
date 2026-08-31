@@ -23,7 +23,7 @@ function getRevealProgress(
   );
 }
 
-function bindScrollMotion(
+export function bindScrollMotion(
   update: () => void,
   reducedMotion: boolean,
 ) {
@@ -68,13 +68,6 @@ function bindScrollMotion(
     window.visualViewport?.removeEventListener("scroll", scheduleUpdate);
     window.visualViewport?.removeEventListener("resize", scheduleUpdate);
   };
-}
-
-export function bindSectionScrollMotion(
-  update: () => void,
-  reducedMotion: boolean,
-) {
-  return bindScrollMotion(update, reducedMotion);
 }
 
 export function initExpertiseMotion(section: HTMLElement) {
