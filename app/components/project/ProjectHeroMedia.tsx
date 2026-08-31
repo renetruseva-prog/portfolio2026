@@ -2,9 +2,34 @@ import { useRef, useState } from "react";
 
 import type { ProjectImage } from "~/content/projects";
 
+const projectAssets = {
+  arrowExternal: "/images/portfolio/project-link-arrow.svg",
+} as const;
+
 type ProjectHeroMediaProps = {
   hero: ProjectImage;
 };
+
+function HeroLinkButton({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      className="project-hero__link project-link-btn project-link-btn--dark"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {label}
+      <img
+        className="project-link-btn__icon project-link-btn__icon--light"
+        src={projectAssets.arrowExternal}
+        alt=""
+        width={17}
+        height={25}
+        draggable={false}
+      />
+    </a>
+  );
+}
 
 export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -19,6 +44,9 @@ export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
           alt={hero.alt}
           draggable={false}
         />
+        {hero.link ? (
+          <HeroLinkButton href={hero.link.href} label={hero.link.label} />
+        ) : null}
       </figure>
     );
   }

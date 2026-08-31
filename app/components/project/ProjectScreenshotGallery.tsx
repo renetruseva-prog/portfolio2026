@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type RefObject } from "react";
 
 import type { ProjectImage, ProjectScreenshotRow } from "~/content/projects";
 
@@ -13,6 +13,117 @@ export { ProjectExpandableImage };
 type ProjectScreenshotGalleryProps = {
   rows: readonly ProjectScreenshotRow[];
 };
+
+function useTripleRowLastImageHeight(
+  rowRef: RefObject<HTMLLIElement | null>,
+  imageSourcesKey: string,
+) {
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+
+    const syncHeights = () => {
+      const images = Array.from(
+        row.querySelectorAll<HTMLImageElement>(".project-gallery__image"),
+      );
+
+      if (images.length < 3) return;
+
+      const [first, second, last] = images;
+
+      last.style.height = "";
+      last.style.removeProperty("object-fit");
+      last.style.removeProperty("object-position");
+
+      if (!first.complete || !second.complete || !last.complete) return;
+
+      const targetHeight = Math.max(first.offsetHeight, second.offsetHeight);
+      if (targetHeight <= 0) return;
+
+      last.style.height = `${targetHeight}px`;
+      last.style.objectFit = "cover";
+      last.style.objectPosition = "top center";
+    };
+
+    const images = row.querySelectorAll<HTMLImageElement>(".project-gallery__image");
+    const loadHandlers = new Map<HTMLImageElement, () => void>();
+
+    images.forEach((image) => {
+      if (image.complete) return;
+
+      const handleLoad = () => syncHeights();
+      loadHandlers.set(image, handleLoad);
+      image.addEventListener("load", handleLoad);
+    });
+
+    syncHeights();
+
+    const resizeObserver = new ResizeObserver(syncHeights);
+    resizeObserver.observe(row);
+    images.forEach((image, index) => {
+      if (index < 2) resizeObserver.observe(image);
+    });
+
+    window.addEventListener("resize", syncHeights);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", syncHeights);
+
+      loadHandlers.forEach((handler, image) => {
+        image.removeEventListener("load", handler);
+      });
+
+      const last = row.querySelector<HTMLImageElement>(
+        ".project-gallery__trigger:nth-child(3) .project-gallery__image",
+      );
+      if (last) {
+        last.style.height = "";
+        last.style.removeProperty("object-fit");
+        last.style.removeProperty("object-position");
+      }
+    };
+  }, [imageSourcesKey]);
+}
+
+function TripleScreenshotRow({
+  row,
+  revealedSrc,
+  onReveal,
+  onOpen,
+}: {
+  row: Extract<ProjectScreenshotRow, { type: "triple" }>;
+  revealedSrc: string | null;
+  onReveal: (src: string) => void;
+  onOpen: (image: ProjectImage) => void;
+}) {
+  const rowRef = useRef<HTMLLIElement>(null);
+  const imageSources = row.images.map((image) => image.src);
+
+  useTripleRowLastImageHeight(rowRef, imageSources.join("|"));
+
+  return (
+    <li
+      ref={rowRef}
+      className="project-gallery__row project-gallery__row--triple"
+    >
+      {row.images.map((image, index) => (
+        <ExpandableImageTrigger
+          key={image.src}
+          image={image}
+          isRevealed={revealedSrc === image.src}
+          onReveal={() => onReveal(image.src)}
+          onOpen={() => onOpen(image)}
+          imageClassName={
+            index === 2
+              ? "project-gallery__image project-gallery__image--triple-last"
+              : "project-gallery__image"
+          }
+        />
+      ))}
+    </li>
+  );
+}
 
 function ScreenshotRow({
   row,
@@ -40,17 +151,12 @@ function ScreenshotRow({
 
   if (row.type === "triple") {
     return (
-      <li className="project-gallery__row project-gallery__row--triple">
-        {row.images.map((image) => (
-          <ExpandableImageTrigger
-            key={image.src}
-            image={image}
-            isRevealed={revealedSrc === image.src}
-            onReveal={() => onReveal(image.src)}
-            onOpen={() => onOpen(image)}
-          />
-        ))}
-      </li>
+      <TripleScreenshotRow
+        row={row}
+        revealedSrc={revealedSrc}
+        onReveal={onReveal}
+        onOpen={onOpen}
+      />
     );
   }
 

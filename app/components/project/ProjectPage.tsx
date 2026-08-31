@@ -1,5 +1,5 @@
 import { Link, href } from "react-router";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import { FooterSection } from "~/components/home/FooterSection";
 import { SiteHeader } from "~/components/layout/SiteHeader";
@@ -100,7 +100,7 @@ function ProjectLinkButton({
 }: {
   href: string;
   label: string;
-  variant: "gold" | "cream";
+  variant: "gold" | "cream" | "dark";
 }) {
   const isExternal = linkHref.startsWith("http");
 
@@ -125,6 +125,55 @@ function ProjectLinkButton({
   );
 }
 
+function ProjectLinkActions({
+  links,
+}: {
+  links: {
+    website?: { href: string; label: string };
+    github?: { href: string; label: string };
+    design?: { href: string; label: string };
+    process?: { href: string; label: string };
+  };
+}) {
+  const hasLinks =
+    links.website || links.github || links.design || links.process;
+
+  if (!hasLinks) return null;
+
+  return (
+    <div className="project-section__actions">
+      {links.website ? (
+        <ProjectLinkButton
+          href={links.website.href}
+          label={links.website.label}
+          variant="gold"
+        />
+      ) : null}
+      {links.design ? (
+        <ProjectLinkButton
+          href={links.design.href}
+          label={links.design.label}
+          variant="gold"
+        />
+      ) : null}
+      {links.github ? (
+        <ProjectLinkButton
+          href={links.github.href}
+          label={links.github.label}
+          variant={links.website || links.design ? "cream" : "gold"}
+        />
+      ) : null}
+      {links.process ? (
+        <ProjectLinkButton
+          href={links.process.href}
+          label={links.process.label}
+          variant="cream"
+        />
+      ) : null}
+    </div>
+  );
+}
+
 function CaseStudyPage({
   project,
   caseStudy,
@@ -139,11 +188,11 @@ function CaseStudyPage({
   const titleId = "project-title";
   const articleRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const article = articleRef.current;
     if (!article) return;
     return initProjectPageMotion(article);
-  }, []);
+  }, [project.slug]);
 
   return (
     <>
@@ -165,7 +214,9 @@ function CaseStudyPage({
                 </span>
                 <span
                   className="project-page__title-accent display-title"
-                  style={{ color: project.accentColor }}
+                  {...(project.accentColor
+                    ? { style: { color: project.accentColor } }
+                    : undefined)}
                 >
                   {caseStudy.titleAccent}
                 </span>
@@ -186,33 +237,7 @@ function CaseStudyPage({
               </h2>
               <p className="project-section__body">{caseStudy.summary}</p>
 
-              {(caseStudy.links.website ||
-                caseStudy.links.github ||
-                caseStudy.links.process) && (
-                <div className="project-section__actions">
-                  {caseStudy.links.website ? (
-                    <ProjectLinkButton
-                      href={caseStudy.links.website.href}
-                      label={caseStudy.links.website.label}
-                      variant="gold"
-                    />
-                  ) : null}
-                  {caseStudy.links.github ? (
-                    <ProjectLinkButton
-                      href={caseStudy.links.github.href}
-                      label={caseStudy.links.github.label}
-                      variant={caseStudy.links.website ? "cream" : "gold"}
-                    />
-                  ) : null}
-                  {caseStudy.links.process ? (
-                    <ProjectLinkButton
-                      href={caseStudy.links.process.href}
-                      label={caseStudy.links.process.label}
-                      variant="cream"
-                    />
-                  ) : null}
-                </div>
-              )}
+              <ProjectLinkActions links={caseStudy.links} />
 
               <hr className="project-divider" />
             </section>
@@ -255,6 +280,34 @@ function CaseStudyPage({
               </div>
             </section>
 
+            {caseStudy.processIntro ? (
+              <section
+                className="project-section project-section--process-intro"
+                aria-labelledby="project-process-intro-heading"
+              >
+                <h2
+                  id="project-process-intro-heading"
+                  className="project-section__title display-title"
+                >
+                  Process
+                </h2>
+                <div className="project-section__copy">
+                  {caseStudy.processIntro.paragraphs.map((paragraph) => (
+                    <p key={paragraph} className="project-section__body">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+                {caseStudy.processIntro.link ? (
+                  <ProjectLinkButton
+                    href={caseStudy.processIntro.link.href}
+                    label={caseStudy.processIntro.link.label}
+                    variant="cream"
+                  />
+                ) : null}
+              </section>
+            ) : null}
+
             <section
               className="project-section"
               aria-labelledby="project-screenshots-heading"
@@ -269,6 +322,35 @@ function CaseStudyPage({
             </section>
 
             <hr className="project-divider project-divider--standalone" />
+
+            {caseStudy.descriptionSection ? (
+              <section
+                className="project-section"
+                aria-labelledby="project-description-section-heading"
+              >
+                <h2
+                  id="project-description-section-heading"
+                  className="project-section__title display-title"
+                >
+                  {caseStudy.descriptionSection.title}
+                </h2>
+                <div className="project-section__copy">
+                  {caseStudy.descriptionSection.paragraphs.map((paragraph) => (
+                    <p key={paragraph} className="project-section__body">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+                {caseStudy.descriptionSection.links ? (
+                  <ProjectLinkActions links={caseStudy.descriptionSection.links} />
+                ) : null}
+                {caseStudy.descriptionSection.screenshotRows ? (
+                  <ProjectScreenshotGallery
+                    rows={caseStudy.descriptionSection.screenshotRows}
+                  />
+                ) : null}
+              </section>
+            ) : null}
 
             {caseStudy.description ? (
               <section
