@@ -201,7 +201,7 @@ function CaseStudyPage({
                     <ProjectLinkButton
                       href={caseStudy.links.github.href}
                       label={caseStudy.links.github.label}
-                      variant="cream"
+                      variant={caseStudy.links.website ? "cream" : "gold"}
                     />
                   ) : null}
                   {caseStudy.links.process ? (
@@ -281,7 +281,13 @@ function CaseStudyPage({
                 >
                   Description
                 </h2>
-                <p className="project-section__body">{caseStudy.description}</p>
+                <div className="project-section__copy">
+                  {caseStudy.description.map((paragraph) => (
+                    <p key={paragraph} className="project-section__body">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </section>
             ) : null}
 

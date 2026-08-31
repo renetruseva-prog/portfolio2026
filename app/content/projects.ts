@@ -13,6 +13,10 @@ export type ProjectImage = {
 
 export type ProjectScreenshotRow =
   | { type: "pair"; images: readonly [ProjectImage, ProjectImage] }
+  | {
+      type: "pair-wide-left";
+      images: readonly [ProjectImage, ProjectImage];
+    }
   | { type: "triple"; images: readonly [ProjectImage, ProjectImage, ProjectImage] }
   | { type: "full"; image: ProjectImage };
 
@@ -32,7 +36,7 @@ export type ProjectCaseStudy = {
   };
   toolkit: readonly ProjectToolkitGroup[];
   screenshotRows: readonly ProjectScreenshotRow[];
-  description?: string;
+  description?: readonly string[];
   role?: readonly string[];
   goals?: readonly string[];
   features?: readonly string[];
@@ -91,6 +95,17 @@ const memomeAssets = {
   screenshot5: "/images/portfolio/project2/screenshot5.png",
   screenshot6: "/images/portfolio/project2/screenshot6.png",
   screenshot7: "/images/portfolio/project2/screenshot7.png",
+} as const;
+
+const webrtcAssets = {
+  hero: "/images/portfolio/project3/project3_thumbnail.png",
+  heroVideo: "/images/portfolio/project3/presentation_project.mp4",
+  screenshot1: "/images/portfolio/project3/screenshot1.png",
+  screenshot2: "/images/portfolio/project3/screenshot2.png",
+  screenshot3: "/images/portfolio/project3/screenshot3.png",
+  screenshot4: "/images/portfolio/project3/screenshot4.png",
+  screenshot5: "/images/portfolio/project3/screenshot5.png",
+  screenshot6: "/images/portfolio/project3/screenshot6.png",
 } as const;
 
 const transgressionAssets = {
@@ -212,11 +227,11 @@ export const projectDetails: ProjectDetail[] = [
           label: "Link to website",
         },
         github: {
-          href: "https://github.com/renetruseva-prog",
+          href: "https://github.com/elitsakutsarova/integration4-team3",
           label: "Link to github",
         },
         process: {
-          href: "https://www.figma.com/design/PZGhPbu9SVBInJ0sB02aVw/Portfolio?node-id=324-5783",
+          href: "https://www.figma.com/design/aIuu9d4dtJ1MUlczgIZ2gN/DEV-integration?node-id=0-1&p=f&t=stsuA9VvAozHdTqQ-0",
           label: "Link to process",
         },
       },
@@ -282,8 +297,9 @@ export const projectDetails: ProjectDetail[] = [
           },
         },
       ],
-      description:
+      description: [
         "MemoMe turns a city visit into a personal souvenir. Users drop memory pins on the map of Antwerp, discover places and events, scan physical QR stickers to unlock collectibles, and flip through a travel diary they can decorate and share.",
+      ],
       role: ["Lead developer", "UX/UI researcher", "Proactive teammate"],
       goals: [
         "have physical and digital engagement",
@@ -310,51 +326,94 @@ export const projectDetails: ProjectDetail[] = [
   {
     slug: "project3",
     title: "Phone to desktop presenter with WebRTC",
-    shortTitle: "WebRTC presenter",
+    shortTitle: "Presenter with WebRTC",
     tags: ["Creative Code", "WebRTC", "Socket.IO"],
-    accentColor: worksSlideCircleColors[2],
+    accentColor: "#D00E0E",
     hero: {
-      src: worksAssets.slide3.phone,
-      alt: "WebRTC presenter phone interface",
+      src: webrtcAssets.hero,
+      alt: "WebRTC Presenter interactive presentation tool preview",
+      video: webrtcAssets.heroVideo,
     },
-    blocks: [
-      {
-        id: "intro",
-        type: "intro",
-        paragraphs: [
-          "A real-time presentation tool that turns a phone into a remote control and second screen for desktop presentations using WebRTC.",
-        ],
-      },
-      {
-        id: "visual",
-        type: "image",
-        src: worksAssets.slide3.hand,
-        alt: "Hand holding phone for WebRTC presenter",
-        fullBleed: true,
-      },
-      {
-        id: "approach",
-        type: "text",
-        title: "Approach",
-        paragraphs: [
-          "The project focused on low-latency communication between devices, with a UI that makes pairing and presenting feel immediate and reliable.",
-          "Socket.IO handles session coordination while WebRTC streams the live content between phone and desktop.",
-        ],
-      },
-      {
-        id: "details",
-        type: "split",
-        title: "Interaction design",
-        imagePosition: "right",
-        image: {
-          src: worksAssets.slide3.sparkleLeft,
-          alt: "Decorative sparkle from WebRTC project",
+    caseStudy: {
+      titleLead: "Presenter",
+      titleAccent: "with WebRTC",
+      summary:
+        "This is a WebRTC-powered presentation remote that turns your phone into a private presenter view equipped with speaker notes, timer, slide navigation, laser pointer, and live camera.",
+      links: {
+        github: {
+          href: "https://github.com/renetruseva-prog/WebRTC",
+          label: "Link to github",
         },
-        paragraphs: [
-          "Visual feedback was kept minimal so presenters can focus on content. Sparkle accents and motion cues reinforce state changes without adding noise.",
-        ],
       },
-    ],
+      toolkit: [
+        {
+          label: "Code",
+          items: [
+            "JavaScript",
+            "WebRTC",
+            "Node.js",
+            "Express",
+            "Socket.IO",
+            "Reveal.js",
+            "HTML",
+            "Css",
+          ],
+        },
+      ],
+      screenshotRows: [
+        {
+          type: "pair-wide-left",
+          images: [
+            {
+              src: webrtcAssets.screenshot1,
+              alt: "WebRTC Presenter desktop setup screen with phone pairing prompt",
+            },
+            {
+              src: webrtcAssets.screenshot2,
+              alt: "QR code modal for pairing a phone as presenter remote",
+            },
+          ],
+        },
+        {
+          type: "triple",
+          images: [
+            {
+              src: webrtcAssets.screenshot3,
+              alt: "Mobile presenter view with speaker notes and slide controls",
+            },
+            {
+              src: webrtcAssets.screenshot4,
+              alt: "Mobile presenter interface with timer and navigation",
+            },
+            {
+              src: webrtcAssets.screenshot5,
+              alt: "Mobile presenter controls with laser pointer and camera options",
+            },
+          ],
+        },
+        {
+          type: "full",
+          image: {
+            src: webrtcAssets.screenshot6,
+            alt: "Desktop presentation slide with picture-in-picture camera stream",
+          },
+        },
+      ],
+      description: [
+        "WebRTC Presenter is a real-time presentation system designed for speakers who want a professional setup without third-party services. The desktop runs the main slide deck (Markdown or PDF via Reveal.js), while a connected phone acts as a private presenter view — showing speaker notes, slide navigation, and a synced timer that the audience doesn't see.",
+        "Devices connect over the local network through a QR code. Socket.IO handles the initial WebRTC handshake, and once connected, slide commands, notes, timer state, laser pointer input, and optional camera video travel over a direct peer-to-peer connection. The phone can control slides via touch buttons or gyroscope tilt, project a laser pointer onto the desktop slides, stream its camera as picture-in-picture, and trigger timed warnings with vibration and audio when the presentation is running low on time.",
+      ],
+      features: [
+        "WebRTC P2P connection",
+        "Socket.IO signaling",
+        "QR code pairing over local network",
+        "Reveal.js slide deck",
+        "Gyroscope navigation",
+        "Laser pointer",
+        "Camera streaming",
+        "Session enforcement",
+      ],
+    },
   },
   {
     slug: "project4",
@@ -427,6 +486,14 @@ export function getAdjacentProjects(slug: string) {
   const next = projectDetails[(index + 1) % projectDetails.length];
 
   return { prev, next };
+}
+
+export function getProjectDocumentTitle(project: ProjectDetail) {
+  const match = project.slug.match(/^project(\d+)$/);
+  if (match) {
+    return `Project ${match[1]} - ${project.title}`;
+  }
+  return project.title;
 }
 
 export function getProjectDescription(project: ProjectDetail) {

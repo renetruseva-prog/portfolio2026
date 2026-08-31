@@ -5,12 +5,13 @@ import {
   getAdjacentProjects,
   getProjectBySlug,
   getProjectDescription,
+  getProjectDocumentTitle,
 } from "~/content/projects";
 import type { Route } from "./+types/works.$slug";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   return [
-    { title: `${loaderData.project.title} — Renet Ruseva` },
+    { title: `${getProjectDocumentTitle(loaderData.project)} — Renet Ruseva` },
     {
       name: "description",
       content: getProjectDescription(loaderData.project),
