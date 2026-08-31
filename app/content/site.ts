@@ -7,6 +7,12 @@ export const site = {
     { label: "About", href: "/#about" },
     { label: "Contact me", href: "/#contact" },
   ],
+  mobileMenuLinks: [
+    { label: "Home", href: "/" },
+    { label: "Works", href: "/#works" },
+    { label: "About", href: "/#about" },
+    { label: "Contacts", href: "/#contact" },
+  ] as const,
   languages: {
     current: "ENG",
     alternate: "BG",
