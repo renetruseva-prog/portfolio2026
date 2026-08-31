@@ -1,11 +1,12 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Link } from "react-router";
 
-import { worksAssets, worksProjects } from "~/content/site";
+import { worksAssets, worksHeroSquiggle, worksProjects } from "~/content/site";
 import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
 import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
 import { initWorksMealsIntro } from "~/lib/works-meals.client";
 import { initWorksMemomeIntro } from "~/lib/works-memome.client";
+import { initWorksSquiggleLayout } from "~/lib/works-squiggle.client";
 import { initWorksWebrtcIntro } from "~/lib/works-webrtc.client";
 import "./works-section.css";
 
@@ -23,8 +24,25 @@ function nextIndex(index: number) {
   return (index + 1) % SLIDE_COUNT;
 }
 
+const ANNOTATION_SLOTS = [
+  "works__annotation--0",
+  "works__annotation--1",
+  "works__annotation--2",
+] as const;
+
+/** Slide 1 tag order in Figma: Creative Code, UX/UI, Design */
+const SLIDE_ONE_ANNOTATION_ORDER = [0, 2, 1] as const;
+
+function annotationTagOrder(slideIndex: number, tagCount: number) {
+  const base = Array.from({ length: tagCount }, (_, index) => index);
+  if (slideIndex !== 0 || tagCount < 3) return base;
+  return [...SLIDE_ONE_ANNOTATION_ORDER];
+}
+
 export function WorksSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const squiggleRef = useRef<SVGSVGElement>(null);
+  const squiggleEndRef = useRef<HTMLSpanElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
   const memomeRef = useRef<HTMLDivElement>(null);
@@ -59,6 +77,14 @@ export function WorksSection() {
     return initWorksMealsIntro(section, meals);
   }, []);
 
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const squiggle = squiggleRef.current;
+    const endAnchor = squiggleEndRef.current;
+    if (!section || !squiggle || !endAnchor) return;
+    return initWorksSquiggleLayout(section, squiggle, endAnchor);
+  }, []);
+
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -72,9 +98,22 @@ export function WorksSection() {
       className="works"
       aria-labelledby="works-title"
     >
-      <h2 id="works-title" className="works__title display-title">
-        Works
-      </h2>
+      <svg
+        ref={squiggleRef}
+        className="works__hero-squiggle"
+        viewBox={worksHeroSquiggle.viewBox}
+        preserveAspectRatio="xMaxYMin meet"
+        overflow="visible"
+        aria-hidden="true"
+      >
+        <path d={worksHeroSquiggle.path} />
+      </svg>
+
+      <div className="works__title-wrap">
+        <h2 id="works-title" className="works__title display-title">
+          Work<span ref={squiggleEndRef} className="works__title-squiggle-end">s</span>
+        </h2>
+      </div>
 
       <article className="works__card">
         {worksProjects.map((project, index) => (
@@ -113,6 +152,17 @@ export function WorksSection() {
             <div className="works__drag-surface">
               <div className="works__stage">
                 <div className="works__visual-track">
+                  <div className="works__headline-track" aria-hidden="true">
+                    {worksProjects.map((project, index) => (
+                      <p
+                        key={project.id}
+                        className={`works__headline works__headline-panel works__headline-panel--${index}`}
+                      >
+                        {project.title}
+                      </p>
+                    ))}
+                  </div>
+
                   <div className="works__circle-bg" aria-hidden="true" />
                   <div
                     ref={visualRef}
@@ -282,6 +332,24 @@ export function WorksSection() {
                       draggable={false}
                     />
                   </div>
+
+                  <div className="works__annotations-track" aria-hidden="true">
+                    {worksProjects.map((project, index) => (
+                      <div
+                        key={project.id}
+                        className={`works__annotations works__annotations-panel works__annotations-panel--${index}`}
+                      >
+                        {annotationTagOrder(index, project.tags.length).map((tagIndex, slotIndex) => (
+                          <span
+                            key={project.tags[tagIndex]}
+                            className={`works__annotation ${ANNOTATION_SLOTS[slotIndex] ?? ANNOTATION_SLOTS[0]}`}
+                          >
+                            {project.tags[tagIndex]}
+                          </span>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -321,6 +389,18 @@ export function WorksSection() {
                   </div>
                 ))}
               </div>
+
+              <div className="works__dots" role="tablist" aria-label="Project slides">
+                {worksProjects.map((project, index) => (
+                  <label
+                    key={project.id}
+                    htmlFor={slideId(index)}
+                    role="tab"
+                    className={`works__dot works__dot--${index}`}
+                    aria-label={`Go to project ${index + 1}: ${project.title}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -337,20 +417,9 @@ export function WorksSection() {
                 alt=""
                 width={83}
                 height={37}
+                draggable={false}
               />
             </label>
-          ))}
-        </div>
-
-        <div className="works__dots" role="tablist" aria-label="Project slides">
-          {worksProjects.map((project, index) => (
-            <label
-              key={project.id}
-              htmlFor={slideId(index)}
-              role="tab"
-              className={`works__dot works__dot--${index}`}
-              aria-label={`Go to project ${index + 1}: ${project.title}`}
-            />
           ))}
         </div>
       </article>

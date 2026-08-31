@@ -340,7 +340,7 @@ export function HeroSection() {
             className="hero__title-line hero__title-line--collage display-title"
             aria-hidden="true"
           >
-            Ruseva
+            Rusev<span id="hero-squiggle-start">a</span>
           </p>
           <img
             ref={starRef}
