@@ -240,6 +240,30 @@
   background-color: var(--color-cream);
 }
 
+.project-link-btn--dark {
+  background-color: rgba(39, 39, 37, 0.9);
+  color: var(--color-text);
+}
+
+.project-link-btn__icon--light {
+  filter: brightness(0) invert(1);
+}
+
+.project-hero__link {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 1;
+}
+
+.project-section--process-intro .project-section__body {
+  margin-bottom: 0;
+}
+
+.project-section--process-intro .project-link-btn {
+  margin-top: 0.25rem;
+}
+
 .project-link-btn__icon {
   flex-shrink: 0;
   display: block;
@@ -249,6 +273,11 @@
   transform: rotate(36deg);
   transition: transform 0.2s ease;
 }
+
+
+.project-page__title-accent display-title {
+   color: rgb(208, 14, 14);
+}  
 
 .project-link-btn:hover .project-link-btn__icon {
   transform: translateX(0.5rem) rotate(36deg);
@@ -307,6 +336,7 @@
   display: grid;
   gap: 1.25rem;
   margin: 0;
+  align-items: start;
 }
 
 .project-gallery__row--pair {
@@ -319,6 +349,12 @@
 
 .project-gallery__row--triple {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+.project-gallery__row--triple .project-gallery__image--triple-last {
+  display: block;
+  width: 100%;
 }
 
 .project-gallery__row--full {
@@ -380,7 +416,6 @@
   display: block;
   width: 100%;
   height: auto;
-  object-fit: cover;
 }
 
 .project-lightbox {
@@ -445,19 +480,6 @@
   box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.45);
 }
 
-.project-gallery__row--pair .project-gallery__image {
-  aspect-ratio: 188 / 165;
-}
-
-.project-gallery__row--triple .project-gallery__image {
-  aspect-ratio: 119 / 236;
-  object-fit: cover;
-}
-
-.project-gallery__row--full .project-gallery__image {
-  aspect-ratio: 398 / 158;
-}
-
 .project-goals {
   margin: 0;
   padding-left: 1.875rem;
@@ -493,7 +515,6 @@
   display: block;
   width: 100%;
   height: auto;
-  object-fit: cover;
 }
 
 .project-adjacent {
@@ -704,27 +725,6 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: 1rem;
-  }
-
-  .project-gallery__row--pair .project-gallery__image {
-    aspect-ratio: auto;
-    min-height: 10rem;
-  }
-
-  .project-gallery__row--pair-wide-left .project-gallery__image {
-    aspect-ratio: auto;
-    min-height: 8.5rem;
-  }
-
-  .project-gallery__row--triple .project-gallery__image {
-    aspect-ratio: auto;
-    min-height: 14rem;
-    max-height: 24rem;
-  }
-
-  .project-gallery__row--full .project-gallery__image {
-    aspect-ratio: auto;
-    max-height: 24rem;
   }
 
   .project-adjacent__link {

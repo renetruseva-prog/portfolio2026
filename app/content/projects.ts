@@ -1,4 +1,4 @@
-import { worksAssets, worksSlideCircleColors } from "~/content/site";
+import { worksSlideCircleColors } from "~/content/site";
 
 export type ProjectLink = {
   href: string;
@@ -9,6 +9,22 @@ export type ProjectImage = {
   src: string;
   alt: string;
   video?: string;
+  link?: ProjectLink;
+};
+
+export type ProjectProcessIntro = {
+  paragraphs: readonly string[];
+  link?: ProjectLink;
+};
+
+export type ProjectDescriptionSection = {
+  title: string;
+  paragraphs: readonly string[];
+  links?: {
+    design?: ProjectLink;
+    process?: ProjectLink;
+  };
+  screenshotRows?: readonly ProjectScreenshotRow[];
 };
 
 export type ProjectScreenshotRow =
@@ -32,11 +48,14 @@ export type ProjectCaseStudy = {
   links: {
     website?: ProjectLink;
     github?: ProjectLink;
+    design?: ProjectLink;
     process?: ProjectLink;
   };
   toolkit: readonly ProjectToolkitGroup[];
   screenshotRows: readonly ProjectScreenshotRow[];
+  processIntro?: ProjectProcessIntro;
   description?: readonly string[];
+  descriptionSection?: ProjectDescriptionSection;
   role?: readonly string[];
   goals?: readonly string[];
   features?: readonly string[];
@@ -79,7 +98,7 @@ export type ProjectDetail = {
   title: string;
   shortTitle?: string;
   tags: readonly string[];
-  accentColor: string;
+  accentColor?: string;
   hero: ProjectImage;
   caseStudy?: ProjectCaseStudy;
   blocks?: readonly ProjectBlock[];
@@ -119,6 +138,31 @@ const transgressionAssets = {
   screenshot6: "/images/portfolio/project1/screenshot6.png",
   styleboard: "/images/portfolio/project1/styleboard.png",
 } as const;
+
+const milesAndMealsAssets = {
+  hero: "/images/portfolio/project4/project4_thumbnail.png",
+  screenshot1: "/images/portfolio/project4/screenshot1.png",
+  screenshot2: "/images/portfolio/project4/screenshot2.png",
+  screenshot3: "/images/portfolio/project4/screenshot3.png",
+  screenshot4: "/images/portfolio/project4/screenshot4.png",
+  screenshot5: "/images/portfolio/project4/screenshot5.png",
+  screenshot6: "/images/portfolio/project4/screenshot6.png",
+  screenshot7: "/images/portfolio/project4/screenshot7.png",
+  screenshot8: "/images/portfolio/project4/screenshot8.png",
+  appScreenshot1: "/images/portfolio/project4/onboarding1.png",
+  appScreenshot2: "/images/portfolio/project4/onboarding2.png",
+  appScreenshot3: "/images/portfolio/project4/onboarding3.png",
+} as const;
+
+const milesAndMealsBehance = "https://www.behance.net/renetruseva";
+const milesAndMealsBrandingDesign =
+  "https://www.figma.com/design/seDoRutsHMvAPfhkxVawjF/Miles---Meals?node-id=6817-1886&p=f&t=DNguRT8ivgxL8E8k-0";
+const milesAndMealsBrandingProcess =
+  "https://www.figma.com/design/seDoRutsHMvAPfhkxVawjF/Miles---Meals?node-id=6817-1889&p=f&t=DNguRT8ivgxL8E8k-0";
+const milesAndMealsAppDesign =
+  "https://www.figma.com/design/seDoRutsHMvAPfhkxVawjF/Miles---Meals?node-id=6817-1887&p=f&t=DNguRT8ivgxL8E8k-0";
+const milesAndMealsAppProcess =
+  "https://www.figma.com/design/seDoRutsHMvAPfhkxVawjF/Miles---Meals?node-id=6817-1888&p=f&t=DNguRT8ivgxL8E8k-0";
 
 export const projectDetails: ProjectDetail[] = [
   {
@@ -420,48 +464,134 @@ export const projectDetails: ProjectDetail[] = [
     title: "Miles and Meals",
     shortTitle: "Miles and Meals",
     tags: ["Branding", "Design", "UI/UX"],
-    accentColor: worksSlideCircleColors[3],
     hero: {
-      src: worksAssets.slide4.foodbox,
-      alt: "Miles and Meals food box branding",
+      src: milesAndMealsAssets.hero,
+      alt: "Miles and Meals logo with suitcase mark on a cream background",
+      link: {
+        href: milesAndMealsBehance,
+        label: "Link to Behance",
+      },
     },
-    blocks: [
-      {
-        id: "intro",
-        type: "intro",
-        paragraphs: [
-          "Miles and Meals is a travel-food brand concept connecting distance, discovery, and local cuisine through a warm, tactile visual identity.",
-        ],
-      },
-      {
-        id: "brand",
-        type: "image",
-        src: worksAssets.slide4.plate,
-        alt: "Plate illustration from Miles and Meals",
-        fullBleed: true,
-      },
-      {
-        id: "identity",
-        type: "text",
-        title: "Brand identity",
-        paragraphs: [
-          "The identity uses earthy tones, hand-drawn utensils, and editorial layouts to feel approachable yet premium — like a food journal you can travel with.",
-        ],
-      },
-      {
-        id: "ui",
-        type: "split",
-        title: "UI direction",
-        imagePosition: "left",
-        image: {
-          src: worksAssets.slide4.knife,
-          alt: "Knife illustration from Miles and Meals",
+    caseStudy: {
+      titleLead: "Miles and Meals",
+      titleAccent: "Branding case",
+      summary:
+        "For this project I was tasked to create a branding identity and app interface for Miles and Meals - a subscription food box service. This case includes everything a brand needs - tone of voice, mood and style, logo, colours, typography, visual direction, icons, packaging and a dedicated app design.",
+      links: {
+        design: {
+          href: milesAndMealsBrandingDesign,
+          label: "Link to design",
         },
+        process: {
+          href: milesAndMealsBrandingProcess,
+          label: "Link to process",
+        },
+      },
+      toolkit: [
+        {
+          label: "Design",
+          items: ["Figma", "Photoshop", "Adobe Illustrator"],
+        },
+      ],
+      processIntro: {
         paragraphs: [
-          "Interface components extend the brand system with rounded cards, generous spacing, and accent color used sparingly for calls to action.",
+          "In order to create this branding, I explored different colours and existing logos for similar brands in the food box industry. Then I sketched out various logo options and tried out compatible fonts, as well as textures and supportive graphic elements.",
+        ],
+        link: {
+          href: milesAndMealsBrandingProcess,
+          label: "Full process",
+        },
+      },
+      screenshotRows: [
+        {
+          type: "pair",
+          images: [
+            {
+              src: milesAndMealsAssets.screenshot1,
+              alt: "Miles and Meals brand positioning with keywords and tone of voice sliders",
+            },
+            {
+              src: milesAndMealsAssets.screenshot2,
+              alt: "Miles and Meals styleboard with reference brands and colour palette",
+            },
+          ],
+        },
+        {
+          type: "pair",
+          images: [
+            {
+              src: milesAndMealsAssets.screenshot3,
+              alt: "Miles and Meals logo typography with annotated letterforms",
+            },
+            {
+              src: milesAndMealsAssets.screenshot4,
+              alt: "Miles and Meals logo elements showing suitcase and bite mark construction",
+            },
+          ],
+        },
+        {
+          type: "pair",
+          images: [
+            {
+              src: milesAndMealsAssets.screenshot5,
+              alt: "Miles and Meals logo variants across colour backgrounds",
+            },
+            {
+              src: milesAndMealsAssets.screenshot6,
+              alt: "Miles and Meals colour palette with primary and secondary swatches",
+            },
+          ],
+        },
+        {
+          type: "pair",
+          images: [
+            {
+              src: milesAndMealsAssets.screenshot7,
+              alt: "Miles and Meals brand typography with Galindo and Space Grotesk",
+            },
+            {
+              src: milesAndMealsAssets.screenshot8,
+              alt: "Miles and Meals brand illustrations and social photography direction",
+            },
+          ],
+        },
+      ],
+      descriptionSection: {
+        title: "Description - App",
+        paragraphs: [
+          "In order to create the app design, I started off by exploring existing app designs and mobile-friendly UX/UI patterns, and highlighting the parts of the design that stood out. Then I went through several iterations for each wireframe and ended up choosing the ones that balanced out aesthetics and usability.",
+        ],
+        links: {
+          design: {
+            href: milesAndMealsAppDesign,
+            label: "Link to design",
+          },
+          process: {
+            href: milesAndMealsAppProcess,
+            label: "Full process",
+          },
+        },
+        screenshotRows: [
+          {
+            type: "triple",
+            images: [
+              {
+                src: milesAndMealsAssets.appScreenshot1,
+                alt: "Miles and Meals app onboarding screen one",
+              },
+              {
+                src: milesAndMealsAssets.appScreenshot2,
+                alt: "Miles and Meals app onboarding screen two",
+              },
+              {
+                src: milesAndMealsAssets.appScreenshot3,
+                alt: "Miles and Meals app onboarding screen three",
+              },
+            ],
+          },
         ],
       },
-    ],
+    },
   },
 ];
 

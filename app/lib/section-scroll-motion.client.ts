@@ -271,7 +271,13 @@ export function initProjectPageMotion(root: HTMLElement) {
     observer.observe(element);
   }
 
+  // Re-measure after route transitions once layout has settled.
+  const layoutRafId = requestAnimationFrame(() => {
+    requestAnimationFrame(update);
+  });
+
   return () => {
+    cancelAnimationFrame(layoutRafId);
     cleanupScroll();
     observer.disconnect();
 
