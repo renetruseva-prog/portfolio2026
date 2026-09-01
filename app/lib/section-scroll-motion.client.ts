@@ -6,6 +6,80 @@ function easeOutCubic(value: number) {
   return 1 - Math.pow(1 - value, 3);
 }
 
+export function getWorksRevealProgress(
+  section: HTMLElement,
+  viewportHeight: number,
+) {
+  const hero = document.querySelector(".hero");
+  const title =
+    section.querySelector<HTMLElement>(".works__title-wrap") ?? section;
+  const titleTop = title.getBoundingClientRect().top;
+  const revealStart = viewportHeight * 1.06;
+  const revealEnd = viewportHeight * 0.34;
+
+  const raw = clamp(
+    (revealStart - titleTop) / Math.max(revealStart - revealEnd, 1),
+    0,
+    1,
+  );
+
+  if (!hero) return raw;
+
+  const gate = clamp(
+    (viewportHeight * 0.92 - hero.getBoundingClientRect().bottom) /
+      Math.max(viewportHeight * 0.2, 1),
+    0,
+    1,
+  );
+
+  return raw * gate;
+}
+
+export function getWorksHeadlineRevealProgress(
+  headlinePanel: HTMLElement,
+  viewportHeight: number,
+) {
+  const rect = headlinePanel.getBoundingClientRect();
+
+  // Panel peeks into the viewport below the fold — keep hidden until it
+  // actually enters the stage band, then fade across the rest of the scroll-in.
+  const fadeInStart = viewportHeight * 0.72;
+  const fadeInEnd = viewportHeight * 0.28;
+
+  if (rect.top > fadeInStart) {
+    return 0;
+  }
+
+  const raw = clamp(
+    (fadeInStart - rect.top) / Math.max(fadeInStart - fadeInEnd, 1),
+    0,
+    1,
+  );
+
+  const hero = document.querySelector(".hero");
+  if (!hero) return raw;
+
+  const gate = clamp(
+    (viewportHeight * 0.92 - hero.getBoundingClientRect().bottom) /
+      Math.max(viewportHeight * 0.2, 1),
+    0,
+    1,
+  );
+
+  return raw * gate;
+}
+
+export function getWorksHeadlineParallaxY(
+  viewportHeight: number,
+  reveal: number,
+) {
+  if (reveal >= 1) {
+    return 0;
+  }
+
+  return (1 - reveal) * viewportHeight * 0.085;
+}
+
 function getRevealProgress(
   element: HTMLElement,
   viewportHeight: number,

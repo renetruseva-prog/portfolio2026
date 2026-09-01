@@ -7,6 +7,7 @@ import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
 import { initWorksMealsIntro } from "~/lib/works-meals.client";
 import { initWorksMemomeIntro } from "~/lib/works-memome.client";
 import { initWorksSquiggleLayout } from "~/lib/works-squiggle.client";
+import { initWorksStageMotion } from "~/lib/works-stage-motion.client";
 import { initWorksWebrtcIntro } from "~/lib/works-webrtc.client";
 import "./works-section.css";
 
@@ -37,6 +38,15 @@ function annotationTagOrder(slideIndex: number, tagCount: number) {
   const base = Array.from({ length: tagCount }, (_, index) => index);
   if (slideIndex !== 0 || tagCount < 3) return base;
   return [...SLIDE_ONE_ANNOTATION_ORDER];
+}
+
+function splitProjectHeadline(title: string): [string, string] {
+  const words = title.trim().split(/\s+/);
+  if (words.length <= 1) {
+    return [title.toUpperCase(), ""];
+  }
+  const accent = words.pop()!;
+  return [words.join(" ").toUpperCase(), accent.toUpperCase()];
 }
 
 export function WorksSection() {
@@ -83,6 +93,12 @@ export function WorksSection() {
     const endAnchor = squiggleEndRef.current;
     if (!section || !squiggle || !endAnchor) return;
     return initWorksSquiggleLayout(section, squiggle, endAnchor);
+  }, []);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    return initWorksStageMotion(section);
   }, []);
 
   useEffect(() => {
@@ -153,14 +169,20 @@ export function WorksSection() {
               <div className="works__stage">
                 <div className="works__visual-track">
                   <div className="works__headline-track" aria-hidden="true">
-                    {worksProjects.map((project, index) => (
-                      <p
-                        key={project.id}
-                        className={`works__headline works__headline-panel works__headline-panel--${index}`}
-                      >
-                        {project.title}
-                      </p>
-                    ))}
+                    {worksProjects.map((project, index) => {
+                      const [lead, accent] = splitProjectHeadline(project.title);
+                      return (
+                        <p
+                          key={project.id}
+                          className={`works__headline works__headline-panel works__headline-panel--${index}`}
+                        >
+                          <span className="works__headline-line">{lead}</span>
+                          {accent ? (
+                            <span className="works__headline-line">{accent}</span>
+                          ) : null}
+                        </p>
+                      );
+                    })}
                   </div>
 
                   <div className="works__circle-bg" aria-hidden="true" />
@@ -333,23 +355,6 @@ export function WorksSection() {
                     />
                   </div>
 
-                  <div className="works__annotations-track" aria-hidden="true">
-                    {worksProjects.map((project, index) => (
-                      <div
-                        key={project.id}
-                        className={`works__annotations works__annotations-panel works__annotations-panel--${index}`}
-                      >
-                        {annotationTagOrder(index, project.tags.length).map((tagIndex, slotIndex) => (
-                          <span
-                            key={project.tags[tagIndex]}
-                            className={`works__annotation ${ANNOTATION_SLOTS[slotIndex] ?? ANNOTATION_SLOTS[0]}`}
-                          >
-                            {project.tags[tagIndex]}
-                          </span>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
 
@@ -402,6 +407,24 @@ export function WorksSection() {
                 ))}
               </div>
             </div>
+          </div>
+
+          <div className="works__annotations-track" aria-hidden="true">
+            {worksProjects.map((project, index) => (
+              <div
+                key={project.id}
+                className={`works__annotations works__annotations-panel works__annotations-panel--${index}`}
+              >
+                {annotationTagOrder(index, project.tags.length).map((tagIndex, slotIndex) => (
+                  <span
+                    key={project.tags[tagIndex]}
+                    className={`works__annotation ${ANNOTATION_SLOTS[slotIndex] ?? ANNOTATION_SLOTS[0]}`}
+                  >
+                    {project.tags[tagIndex]}
+                  </span>
+                ))}
+              </div>
+            ))}
           </div>
 
           {worksProjects.map((_, index) => (

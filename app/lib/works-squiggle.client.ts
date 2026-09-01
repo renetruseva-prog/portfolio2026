@@ -1,4 +1,7 @@
-import { bindScrollMotion } from "~/lib/section-scroll-motion.client";
+import {
+  bindScrollMotion,
+  getWorksRevealProgress,
+} from "~/lib/section-scroll-motion.client";
 
 const DESKTOP_LAYOUT = "(min-width: 30rem)";
 const SQUIGGLE_START_ID = "hero-squiggle-start";
@@ -29,32 +32,6 @@ function clamp(value: number, min: number, max: number) {
 
 function easeOutCubic(value: number) {
   return 1 - Math.pow(1 - value, 3);
-}
-
-function getSquiggleDrawProgress(section: HTMLElement, viewportHeight: number) {
-  const hero = document.querySelector(".hero");
-  const title =
-    section.querySelector<HTMLElement>(".works__title-wrap") ?? section;
-  const titleTop = title.getBoundingClientRect().top;
-  const revealStart = viewportHeight * 1.06;
-  const revealEnd = viewportHeight * 0.34;
-
-  const raw = clamp(
-    (revealStart - titleTop) / Math.max(revealStart - revealEnd, 1),
-    0,
-    1,
-  );
-
-  if (!hero) return raw;
-
-  const gate = clamp(
-    (viewportHeight * 0.92 - hero.getBoundingClientRect().bottom) /
-      Math.max(viewportHeight * 0.2, 1),
-    0,
-    1,
-  );
-
-  return raw * gate;
 }
 
 /**
@@ -131,7 +108,7 @@ export function initWorksSquiggleLayout(
       window.innerHeight || document.documentElement.clientHeight;
     const draw = reducedMotion
       ? 1
-      : easeOutCubic(getSquiggleDrawProgress(section, viewportHeight));
+      : easeOutCubic(getWorksRevealProgress(section, viewportHeight));
 
     squiggle.style.setProperty("--squiggle-draw", String(draw));
     squiggle.classList.toggle("is-revealed", draw >= 1);
