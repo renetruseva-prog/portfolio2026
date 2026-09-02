@@ -1,4 +1,4 @@
-import { bindSectionScrollMotion } from "~/lib/section-scroll-motion.client";
+import { bindScrollMotion } from "~/lib/section-scroll-motion.client";
 
 export function initLanguagesWiggle(section: HTMLElement) {
   const tags = Array.from(section.querySelectorAll<HTMLElement>(".languages__tags li"));
@@ -55,7 +55,7 @@ export function initLanguagesWiggle(section: HTMLElement) {
     };
   });
 
-  const cleanupScroll = bindSectionScrollMotion(updateScrollWiggles, reducedMotion);
+  const cleanupScroll = bindScrollMotion(updateScrollWiggles, reducedMotion);
 
   return () => {
     cleanupScroll();

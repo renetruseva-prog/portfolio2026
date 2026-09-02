@@ -57,6 +57,17 @@ type Point = { x: number; y: number };
 
 export const FEATURED_SCALE = 1.3;
 
+function resolveFeaturedScale(element: HTMLElement) {
+  const collage = element.closest(".hero__collage");
+  if (!collage) {
+    return FEATURED_SCALE;
+  }
+
+  const raw = getComputedStyle(collage).getPropertyValue("--hero-featured-scale").trim();
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : FEATURED_SCALE;
+}
+
 const SKETCHBOOK_ROTATE = "30deg";
 
 function isSketchbookElement(element: HTMLElement) {
@@ -126,15 +137,16 @@ function getFeaturedScaleMultiplier(
   progress: number,
   fromFeatured: boolean,
   toFeatured: boolean,
+  featuredScale: number,
 ) {
   const eased = easeInOutSine(progress);
 
   if (toFeatured) {
-    return 1 + (FEATURED_SCALE - 1) * eased;
+    return 1 + (featuredScale - 1) * eased;
   }
 
   if (fromFeatured) {
-    return FEATURED_SCALE - (FEATURED_SCALE - 1) * eased;
+    return featuredScale - (featuredScale - 1) * eased;
   }
 
   return 1;
@@ -149,10 +161,12 @@ function applyFeaturedScale(
     return;
   }
 
+  const featuredScale = resolveFeaturedScale(element);
   const scale = getFeaturedScaleMultiplier(
     progress,
     scaleState.fromFeatured,
     scaleState.toFeatured,
+    featuredScale,
   );
 
   element.style.scale = scaleState.flipX ? `${-scale} ${scale}` : `${scale}`;

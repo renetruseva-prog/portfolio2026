@@ -704,7 +704,7 @@
   opacity: 0.75;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 30rem) {
   .project-page__inner {
     gap: 3.5rem;
     max-width: 72rem;
@@ -763,7 +763,7 @@
   }
 }
 
-@media (max-width: 47.99rem) {
+@media (max-width: 29.99rem) {
   .project-link-btn {
     min-height: var(--btn-height-mobile);
   }

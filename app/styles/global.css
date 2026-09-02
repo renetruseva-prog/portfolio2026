@@ -81,7 +81,7 @@ button {
   text-transform: uppercase;
 }
 
-@media (max-width: 47.99rem) {
+@media (max-width: 29.99rem) {
   .hero__cta,
   .works__cta,
   .about__cta {
@@ -107,10 +107,22 @@ button {
   background-color: var(--color-text);
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 30rem) {
+  .page-main {
+    max-width: 90rem;
+    margin: 0 auto;
+    padding: 0 6.25rem;
+  }
+
   html,
   body {
     overflow-y: auto;
+  }
+}
+
+@media (min-width: 30rem) and (max-width: 63.99rem) {
+  .page-main {
+    padding-inline: clamp(1.5rem, 6vw, 6.25rem);
   }
 }
 

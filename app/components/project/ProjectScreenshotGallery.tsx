@@ -4,11 +4,8 @@ import type { ProjectImage, ProjectScreenshotRow } from "~/content/projects";
 
 import {
   ExpandableImageTrigger,
-  ProjectExpandableImage,
   ProjectImageLightbox,
 } from "./ProjectExpandableImage";
-
-export { ProjectExpandableImage };
 
 type ProjectScreenshotGalleryProps = {
   rows: readonly ProjectScreenshotRow[];

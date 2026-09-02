@@ -107,7 +107,7 @@
   opacity: 0.85;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 30rem) {
   .expertise {
     gap: 3rem;
     padding: 3rem 0 6rem;

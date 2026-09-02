@@ -38,6 +38,47 @@ function slideColor(index: number) {
   return worksSlideCircleColors[index] ?? worksSlideCircleColors[0];
 }
 
+function preventSlideScrollJump(section: HTMLElement) {
+  const labels = section.querySelectorAll<HTMLLabelElement>('label[for^="works-slide-"]');
+  const onLabelMouseDown = (event: MouseEvent) => {
+    event.preventDefault();
+  };
+
+  for (const label of labels) {
+    label.addEventListener("mousedown", onLabelMouseDown);
+  }
+
+  const onRadioFocus = (event: FocusEvent) => {
+    (event.target as HTMLInputElement).blur();
+    restoreScroll();
+  };
+
+  const restoreScroll = () => {
+    const y = window.scrollY;
+    requestAnimationFrame(() => {
+      if (window.scrollY !== y) {
+        window.scrollTo(0, y);
+      }
+    });
+  };
+
+  const radios = section.querySelectorAll<HTMLInputElement>('input[name="works-slide"]');
+  for (const radio of radios) {
+    radio.addEventListener("change", restoreScroll);
+    radio.addEventListener("focus", onRadioFocus);
+  }
+
+  return () => {
+    for (const label of labels) {
+      label.removeEventListener("mousedown", onLabelMouseDown);
+    }
+    for (const radio of radios) {
+      radio.removeEventListener("change", restoreScroll);
+      radio.removeEventListener("focus", onRadioFocus);
+    }
+  };
+}
+
 function createCircleColorController(viewport: HTMLElement) {
   const track = viewport.querySelector<HTMLElement>(".works__visual-track");
   if (!track) {
@@ -147,6 +188,52 @@ function goToSlide(index: number) {
   if (!radio || radio.checked) return;
   radio.checked = true;
   radio.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function isEditableTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+
+  return (
+    target.isContentEditable ||
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.tagName === "SELECT"
+  );
+}
+
+function isWorksSectionActive(section: HTMLElement, target: EventTarget | null) {
+  if (target instanceof Node && section.contains(target)) return true;
+
+  const rect = section.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+  return rect.top < viewportHeight * 0.85 && rect.bottom > viewportHeight * 0.15;
+}
+
+function initWorksSlideKeyboard(section: HTMLElement) {
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (isEditableTarget(event.target)) return;
+    if (!isWorksSectionActive(section, event.target)) return;
+
+    let targetIndex: number | null = null;
+
+    if (event.key === "ArrowLeft") {
+      targetIndex = prevIndex(getCheckedSlideIndex());
+    } else if (event.key === "ArrowRight") {
+      targetIndex = nextIndex(getCheckedSlideIndex());
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    goToSlide(targetIndex);
+  };
+
+  window.addEventListener("keydown", onKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", onKeyDown);
+  };
 }
 
 function setSurfaceOffset(
@@ -391,6 +478,9 @@ export function initWorksCarouselDrag(viewport: HTMLElement) {
   initializedViewports.add(viewport);
 
   const circleColor = createCircleColorController(viewport);
+  const section = viewport.closest<HTMLElement>(".works");
+  const releaseScrollLock = section ? preventSlideScrollJump(section) : () => {};
+  const releaseKeyboard = section ? initWorksSlideKeyboard(section) : () => {};
   const isCoarse = window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
   let detach = attachNativeSwipe(viewport, surface, circleColor);
 
@@ -409,6 +499,8 @@ export function initWorksCarouselDrag(viewport: HTMLElement) {
   }
 
   return () => {
+    releaseScrollLock();
+    releaseKeyboard();
     detach();
     circleColor.dispose();
     initializedViewports.delete(viewport);

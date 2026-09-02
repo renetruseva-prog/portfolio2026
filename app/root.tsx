@@ -11,7 +11,6 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
-  { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
   { rel: "stylesheet", href: "/fonts/baik.css" },
   {
     rel: "preload",
@@ -28,7 +27,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Beth+Ellen&family=Catamaran:wght@400;600;700&family=Chivo:ital,wght@0,400;0,600;1,400&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Beth+Ellen&family=Catamaran:wght@400;600;700&family=Chivo:ital,wght@0,400;0,600;1,400&family=Vina+Sans&display=swap",
   },
 ];
 
@@ -38,6 +37,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico?v=3" sizes="32x32" />
+        <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.png?v=3" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" sizes="180x180" />
         <Meta />
         <Links />
       </head>

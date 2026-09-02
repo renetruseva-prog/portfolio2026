@@ -96,7 +96,6 @@ export function HeroSection() {
   const [displayStep, setDisplayStep] = useState(0);
   const [isOrbitAnimating, setIsOrbitAnimating] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
-  const coreGridRef = useRef<HTMLDivElement>(null);
   const orbitStepRef = useRef(0);
   const itemRefs = useRef<Map<string, HTMLImageElement>>(new Map);
   const cancelAnimationRef = useRef<(() => void) | null>(null);
@@ -177,29 +176,53 @@ export function HeroSection() {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__content">
-        <p className="hero__tagline display-title">{site.tagline}</p>
+        <div className="hero__intro">
+          <p className="hero__tagline display-title">{site.tagline}</p>
 
-        <h1 id="hero-title" className="hero__title display-title">
-          <span className="hero__title-line hero__title-line--renet">Renet</span>{" "}
-          <span className="hero__title-line hero__title-line--offset">Ruseva</span>
-        </h1>
-
-        <p className="hero__bio">{site.bio}</p>
-
-        <a href={site.cta.href} className="hero__cta">
-          {site.cta.label}
-          <img
-            className="hero__cta-arrow"
-            src={heroAssets.ctaArrow}
-            alt=""
-            width={30}
-            height={20}
-          />
-        </a>
+          <h1 id="hero-title" className="hero__title display-title">
+            <span className="hero__title-line hero__title-line--renet">
+              Ren<span className="hero__title-ruseva-anchor">e</span>t
+            </span>{" "}
+            <span className="hero__title-line hero__title-line--offset">Ruseva</span>
+          </h1>
+        </div>
       </div>
 
+      <div className="hero__ruseva-group">
+        <p
+          className="hero__title-line hero__title-line--collage display-title"
+          aria-hidden="true"
+        >
+          Rusev<span id="hero-squiggle-start">a</span>
+        </p>
+
+        <div className="hero__copy">
+          <p className="hero__bio">{site.bio}</p>
+
+          <a href={site.cta.href} className="hero__cta">
+            {site.cta.label}
+            <img
+              className="hero__cta-arrow"
+              src={heroAssets.ctaArrow}
+              alt=""
+              width={30}
+              height={20}
+            />
+          </a>
+        </div>
+      </div>
+
+      <img
+        className="hero__title-star"
+        src={heroAssets.star}
+        alt=""
+        width={36}
+        height={36}
+        aria-hidden="true"
+      />
+
       <div className="hero__collage" aria-hidden="true">
-        <div className="hero__grid hero__grid--core" ref={coreGridRef}>
+        <div className="hero__grid hero__grid--core">
           <img
             className="hero__item hero__item--circle"
             src={heroAssets.circle}

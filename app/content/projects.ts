@@ -601,10 +601,6 @@ export function getProjectBySlug(slug: string) {
   return projectMap.get(slug);
 }
 
-export function getProjectSlugs() {
-  return projectDetails.map((project) => project.slug);
-}
-
 export function getAdjacentProjects(slug: string) {
   const index = projectDetails.findIndex((project) => project.slug === slug);
 
