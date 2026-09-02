@@ -190,6 +190,52 @@ function goToSlide(index: number) {
   radio.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
+function isEditableTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+
+  return (
+    target.isContentEditable ||
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.tagName === "SELECT"
+  );
+}
+
+function isWorksSectionActive(section: HTMLElement, target: EventTarget | null) {
+  if (target instanceof Node && section.contains(target)) return true;
+
+  const rect = section.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+  return rect.top < viewportHeight * 0.85 && rect.bottom > viewportHeight * 0.15;
+}
+
+function initWorksSlideKeyboard(section: HTMLElement) {
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (isEditableTarget(event.target)) return;
+    if (!isWorksSectionActive(section, event.target)) return;
+
+    let targetIndex: number | null = null;
+
+    if (event.key === "ArrowLeft") {
+      targetIndex = prevIndex(getCheckedSlideIndex());
+    } else if (event.key === "ArrowRight") {
+      targetIndex = nextIndex(getCheckedSlideIndex());
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    goToSlide(targetIndex);
+  };
+
+  window.addEventListener("keydown", onKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", onKeyDown);
+  };
+}
+
 function setSurfaceOffset(
   surface: HTMLElement,
   deltaX: number,
@@ -434,6 +480,7 @@ export function initWorksCarouselDrag(viewport: HTMLElement) {
   const circleColor = createCircleColorController(viewport);
   const section = viewport.closest<HTMLElement>(".works");
   const releaseScrollLock = section ? preventSlideScrollJump(section) : () => {};
+  const releaseKeyboard = section ? initWorksSlideKeyboard(section) : () => {};
   const isCoarse = window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
   let detach = attachNativeSwipe(viewport, surface, circleColor);
 
@@ -453,6 +500,7 @@ export function initWorksCarouselDrag(viewport: HTMLElement) {
 
   return () => {
     releaseScrollLock();
+    releaseKeyboard();
     detach();
     circleColor.dispose();
     initializedViewports.delete(viewport);

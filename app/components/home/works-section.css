@@ -672,6 +672,8 @@
   grid-row: 6 / 9;
   grid-column: 6 / 9;
   z-index: 3;
+  width: 100%;
+  min-width: 0;
   height: auto;
   justify-self: end;
   align-self: end;
@@ -1214,6 +1216,23 @@
   .works__annotation--slide-2-2 {
     left: 105%;
     top: 78%;
+    transform: translateX(-100%);
+  }
+
+  .works__annotation--slide-3-0 {
+    left: 15%;
+    top: 59%;
+  }
+
+  .works__annotation--slide-3-1 {
+    left: 93%;
+    top: 35%;
+    transform: translateX(-100%);
+  }
+
+  .works__annotation--slide-3-2 {
+    left: 85%;
+    top: 80%;
     transform: translateX(-100%);
   }
 

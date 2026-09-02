@@ -288,7 +288,8 @@ export const worksProjects: WorkProject[] = [
   {
     id: "project4",
     title: "Miles and Meals",
-    tags: ["Branding", "Design", "UI/UX"],
+    headlineLines: ["Miles and", "Meals brand"],
+    tags: ["Branding", "UX/UI", "Design"],
     href: "/works/project4",
     ctaLabel: "See more",
   },
