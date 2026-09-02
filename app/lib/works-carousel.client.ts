@@ -38,6 +38,47 @@ function slideColor(index: number) {
   return worksSlideCircleColors[index] ?? worksSlideCircleColors[0];
 }
 
+function preventSlideScrollJump(section: HTMLElement) {
+  const labels = section.querySelectorAll<HTMLLabelElement>('label[for^="works-slide-"]');
+  const onLabelMouseDown = (event: MouseEvent) => {
+    event.preventDefault();
+  };
+
+  for (const label of labels) {
+    label.addEventListener("mousedown", onLabelMouseDown);
+  }
+
+  const onRadioFocus = (event: FocusEvent) => {
+    (event.target as HTMLInputElement).blur();
+    restoreScroll();
+  };
+
+  const restoreScroll = () => {
+    const y = window.scrollY;
+    requestAnimationFrame(() => {
+      if (window.scrollY !== y) {
+        window.scrollTo(0, y);
+      }
+    });
+  };
+
+  const radios = section.querySelectorAll<HTMLInputElement>('input[name="works-slide"]');
+  for (const radio of radios) {
+    radio.addEventListener("change", restoreScroll);
+    radio.addEventListener("focus", onRadioFocus);
+  }
+
+  return () => {
+    for (const label of labels) {
+      label.removeEventListener("mousedown", onLabelMouseDown);
+    }
+    for (const radio of radios) {
+      radio.removeEventListener("change", restoreScroll);
+      radio.removeEventListener("focus", onRadioFocus);
+    }
+  };
+}
+
 function createCircleColorController(viewport: HTMLElement) {
   const track = viewport.querySelector<HTMLElement>(".works__visual-track");
   if (!track) {
@@ -391,6 +432,8 @@ export function initWorksCarouselDrag(viewport: HTMLElement) {
   initializedViewports.add(viewport);
 
   const circleColor = createCircleColorController(viewport);
+  const section = viewport.closest<HTMLElement>(".works");
+  const releaseScrollLock = section ? preventSlideScrollJump(section) : () => {};
   const isCoarse = window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
   let detach = attachNativeSwipe(viewport, surface, circleColor);
 
@@ -409,6 +452,7 @@ export function initWorksCarouselDrag(viewport: HTMLElement) {
   }
 
   return () => {
+    releaseScrollLock();
     detach();
     circleColor.dispose();
     initializedViewports.delete(viewport);

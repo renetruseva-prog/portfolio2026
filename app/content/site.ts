@@ -46,6 +46,7 @@ export type WorkProject = {
   title: string;
   headlineLead?: string;
   headlineAccent?: string;
+  headlineLines?: readonly string[];
   tags: readonly string[];
   href: string;
   ctaLabel: string;
@@ -76,6 +77,9 @@ export const worksAssets = {
     sparkleLeft: "/images/portfolio/works-memome/slide3/left_sparkle.png",
     sparkleRight: "/images/portfolio/works-memome/slide3/right_sparkle.png",
     sparkleBottom: "/images/portfolio/works-memome/slide3/sparkle_bottom.png",
+    sparkleLeftDesktop: "/images/portfolio/works-memome/slide3/left_sparkle_desktop.png",
+    sparkleRightDesktop: "/images/portfolio/works-memome/slide3/right_sparkle_desktop.png",
+    sparkleBottomDesktop: "/images/portfolio/works-memome/slide3/bottom_sparkle_desktop.png",
   },
   slide4: {
     foodbox: "/images/portfolio/works-memome/slide4/foodbox.png",
@@ -276,6 +280,7 @@ export const worksProjects: WorkProject[] = [
   {
     id: "project3",
     title: "Phone to desktop presenter with WebRTC",
+    headlineLines: ["Web RTC", "presenter"],
     tags: ["Creative Code", "WebRTC", "Socket.IO"],
     href: "/works/project3",
     ctaLabel: "See more",

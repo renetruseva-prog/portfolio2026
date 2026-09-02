@@ -72,6 +72,15 @@ function projectHeadline(project: WorkProject): [string, string] {
   return splitProjectHeadline(project.title);
 }
 
+function projectHeadlineLines(project: WorkProject): string[] {
+  if (project.headlineLines?.length) {
+    return project.headlineLines.map((line) => line.toUpperCase());
+  }
+
+  const [lead, accent] = projectHeadline(project);
+  return accent ? [lead, accent] : [lead];
+}
+
 export function WorksSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const squiggleRef = useRef<SVGSVGElement>(null);
@@ -193,16 +202,17 @@ export function WorksSection() {
                 <div className="works__visual-track">
                   <div className="works__headline-track" aria-hidden="true">
                     {worksProjects.map((project, index) => {
-                      const [lead, accent] = projectHeadline(project);
+                      const lines = projectHeadlineLines(project);
                       return (
                         <p
                           key={project.id}
                           className={`works__headline works__headline-panel works__headline-panel--${index}`}
                         >
-                          <span className="works__headline-line">{lead}</span>
-                          {accent ? (
-                            <span className="works__headline-line">{accent}</span>
-                          ) : null}
+                          {lines.map((line) => (
+                            <span key={line} className="works__headline-line">
+                              {line}
+                            </span>
+                          ))}
                         </p>
                       );
                     })}
@@ -314,30 +324,48 @@ export function WorksSection() {
                       height={543}
                       draggable={false}
                     />
-                    <img
-                      className="works__webrtc-sparkle works__webrtc-sparkle--left works__webrtc-sparkle--animate"
-                      src={worksAssets.slide3.sparkleLeft}
-                      alt=""
-                      width={521}
-                      height={614}
-                      draggable={false}
-                    />
-                    <img
-                      className="works__webrtc-sparkle works__webrtc-sparkle--right works__webrtc-sparkle--animate"
-                      src={worksAssets.slide3.sparkleRight}
-                      alt=""
-                      width={577}
-                      height={620}
-                      draggable={false}
-                    />
-                    <img
-                      className="works__webrtc-sparkle works__webrtc-sparkle--bottom works__webrtc-sparkle--animate"
-                      src={worksAssets.slide3.sparkleBottom}
-                      alt=""
-                      width={496}
-                      height={364}
-                      draggable={false}
-                    />
+                    <picture className="works__webrtc-sparkle-picture">
+                      <source
+                        media="(min-width: 48rem)"
+                        srcSet={worksAssets.slide3.sparkleLeftDesktop}
+                      />
+                      <img
+                        className="works__webrtc-sparkle works__webrtc-sparkle--left works__webrtc-sparkle--animate"
+                        src={worksAssets.slide3.sparkleLeft}
+                        alt=""
+                        width={100}
+                        height={118}
+                        draggable={false}
+                      />
+                    </picture>
+                    <picture className="works__webrtc-sparkle-picture">
+                      <source
+                        media="(min-width: 48rem)"
+                        srcSet={worksAssets.slide3.sparkleRightDesktop}
+                      />
+                      <img
+                        className="works__webrtc-sparkle works__webrtc-sparkle--right works__webrtc-sparkle--animate"
+                        src={worksAssets.slide3.sparkleRight}
+                        alt=""
+                        width={114}
+                        height={118}
+                        draggable={false}
+                      />
+                    </picture>
+                    <picture className="works__webrtc-sparkle-picture">
+                      <source
+                        media="(min-width: 48rem)"
+                        srcSet={worksAssets.slide3.sparkleBottomDesktop}
+                      />
+                      <img
+                        className="works__webrtc-sparkle works__webrtc-sparkle--bottom works__webrtc-sparkle--animate"
+                        src={worksAssets.slide3.sparkleBottom}
+                        alt=""
+                        width={96}
+                        height={76}
+                        draggable={false}
+                      />
+                    </picture>
                   </div>
 
                   <div
