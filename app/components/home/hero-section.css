@@ -10,6 +10,10 @@
   display: contents;
 }
 
+.hero__ruseva-group {
+  display: contents;
+}
+
 .hero__intro {
   order: 1;
   display: flex;
@@ -414,6 +418,7 @@
 
 @media (min-width: 30rem) {
   .hero {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(auto, 0.88fr) minmax(auto, 1.12fr);
     grid-template-areas:
@@ -431,6 +436,14 @@
     --hero-copy-lift: 0.8;
     --hero-star-gap: 2rem;
     --hero-star-x: 3.27rem;
+    --hero-tagline-size: clamp(2.5rem, 4vw, 4.375rem);
+    --hero-name-size: clamp(4.5rem, 10.5vw, 10.3125rem);
+    --hero-name-ink-height: calc(var(--hero-name-size) * 0.92);
+    --hero-ruseva-left: calc(var(--hero-name-size) * 1.9644);
+    --hero-ruseva-base-top: calc(
+      var(--hero-tagline-size) * 0.95 + 2rem + var(--hero-name-ink-height) +
+        var(--hero-name-line-gap)
+    );
     margin-top: 3rem;
   }
 
@@ -444,7 +457,7 @@
   }
 
   .hero__tagline {
-    font-size: clamp(2.5rem, 4vw, 4.375rem);
+    font-size: var(--hero-tagline-size);
     line-height: 0.95;
     min-width: 13rem;
   }
@@ -460,7 +473,7 @@
 
   .hero__title-line--renet {
     display: block;
-    font-size: clamp(4.5rem, 10.5vw, 10.3125rem);
+    font-size: var(--hero-name-size);
     line-height: 0.92;
     white-space: nowrap;
     margin: 0;
@@ -474,12 +487,15 @@
   .hero__title-line--collage {
     display: block;
     position: absolute;
-    inset: auto;
+    left: var(--hero-ruseva-left);
+    top: var(--hero-ruseva-base-top);
+    translate: 0 calc(-100% * var(--hero-ruseva-lift));
     z-index: 5;
     margin: 0;
     padding: 0;
-    font-size: clamp(4.5rem, 10.5vw, 10.3125rem);
+    font-size: var(--hero-name-size);
     line-height: 0.92;
+    width: max-content;
     white-space: nowrap;
     pointer-events: none;
   }
@@ -487,14 +503,17 @@
   .hero__title-star {
     display: block;
     position: absolute;
-    inset: auto;
+    left: calc(
+      var(--hero-ruseva-left) + var(--hero-star-x) + var(--hero-star-x-offset, 0rem) +
+        var(--hero-star-x-nudge, 0rem)
+    );
+    top: calc(
+      var(--hero-ruseva-base-top) -
+        var(--hero-name-ink-height) * var(--hero-ruseva-lift)
+    );
+    translate: -50% calc(-100% - var(--hero-star-gap));
     z-index: 5;
     height: auto;
-  }
-
-  .hero__item--hand {
-    z-index: 6;
-    grid-row: 3 / 9;
   }
 
   .hero__copy {
@@ -502,6 +521,12 @@
     align-items: flex-start;
     gap: 1.25rem;
     align-self: start;
+    margin-top:-1rem;
+  }
+
+  .hero__item--hand {
+    z-index: 6;
+    grid-row: 3 / 9;
   }
 
   .hero__bio {
@@ -648,34 +673,47 @@
   .hero {
     grid-template-columns: minmax(auto, 0.85fr) minmax(auto, 1.15fr);
     --hero-star-x-offset: 9.8rem;
+    --hero-tagline-size: 4.375rem;
+    --hero-name-size: 10.3125rem;
   }
 
-  .hero__tagline {
-    font-size: 4.375rem;
-  }
-
-  .hero__title-line--renet,
-  .hero__title-line--collage {
-    font-size: 10.3125rem;
+  .hero__copy {
+    margin-top: var(--hero-copy-offset);
+    translate: 0 calc(-100% * var(--hero-copy-lift));
   }
 }
 
 @media (min-width: 1024px) and (max-width: 1179px) {
-  .hero__tagline {
-    font-size: clamp(2.5rem, 3.8vw, 3.75rem);
-  }
-
-  .hero__title-line--renet,
-  .hero__title-line--collage {
-    font-size: clamp(5rem, 7.8vw, 7.5rem);
+  .hero {
+    --hero-tagline-size: clamp(2.5rem, 3.8vw, 3.75rem);
+    --hero-name-size: clamp(5rem, 7.8vw, 7.5rem);
   }
 }
 
 @media (min-width: 30rem) and (max-width: 1179px) {
   .hero {
     grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
-    --hero-copy-below-ruseva-gap: 1rem;
+    --hero-copy-below-ruseva-gap: 2rem;
     --hero-star-x-offset: 6rem;
+  }
+
+  .hero__ruseva-group {
+    display: flex;
+    position: absolute;
+    left: var(--hero-ruseva-left);
+    top: calc(
+      var(--hero-ruseva-base-top) -
+        var(--hero-name-ink-height) * var(--hero-ruseva-lift)
+    );
+    z-index: 7;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--hero-copy-below-ruseva-gap);
+  }
+
+  .hero__ruseva-group .hero__title-line--collage {
+    position: static;
+    translate: none;
   }
 
   .hero__title-star {
@@ -697,10 +735,8 @@
 }
 
 @media (min-width: 30rem) and (max-width: 63.99rem) {
-
-  .hero__title-line--renet,
-  .hero__title-line--collage {
-    font-size: clamp(3.75rem, 9vw, 7.5rem);
+  .hero {
+    --hero-name-size: clamp(3.75rem, 9vw, 7.5rem);
   }
 
   .hero__bio {

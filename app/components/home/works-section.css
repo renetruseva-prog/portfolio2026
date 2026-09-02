@@ -1,9 +1,3 @@
-@property --works-write-progress {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-
 .works {
   display: flex;
   flex-direction: column;
@@ -406,8 +400,12 @@
   grid-row: 6 / 9;
   grid-column: 1 / 3;
   z-index: 3;
-  min-width: 4rem;
+  width: 100%;
   height: auto;
+  min-width: 0;
+  justify-self: start;
+  align-self: end;
+  object-fit: contain;
   margin-left: -28%;
   transform-origin: 72% 88%;
 }
@@ -677,15 +675,17 @@
   min-width: 0;
 }
 
+.works__project-title.display-title {
+  line-height: 1.3;
+}
+
 .works__project-title {
   margin: 0;
   font-size: clamp(1.5rem, 8vw, 2.75rem);
-  line-height: 1.3;
   text-transform: uppercase;
   margin-top: 0.75rem;
   margin-bottom: 1rem;
-  max-width: 100%;
-  min-width: 0;
+  min-width: 17rem;
 }
 
 #works-slide-1:checked~.works__carousel .works__details-panel--1 .works__project-title,
@@ -835,7 +835,7 @@
   }
 }
 
-@media (min-width: 30rem) {
+@media (min-width: 48rem) {
   .works {
     position: relative;
     display: flex;
@@ -953,7 +953,16 @@
     container-type: inline-size;
     container-name: works-visual;
     overflow: visible;
+  }
+
+  #works-slide-0:checked ~ .works__carousel .works__visual-track, #works-slide-2:checked ~ .works__carousel .works__visual-track 
+  {
     margin-bottom: 2rem;
+  }
+
+  #works-slide-1:checked ~ .works__carousel .works__visual-track
+  {
+    margin-bottom: 3rem;
   }
 
   .works__headline-track {
@@ -964,7 +973,7 @@
     grid-template: 1fr / 1fr;
     pointer-events: none;
     min-width: 0;
-    overflow: clip;
+    overflow: visible;
   }
 
   .works__headline-panel {
@@ -991,6 +1000,10 @@
   #works-slide-2:checked~.works__carousel .works__headline-panel--2,
   #works-slide-3:checked~.works__carousel .works__headline-panel--3 {
     display: block;
+  }
+
+  .works__headline-panel--1 .works__headline {
+    font-size: clamp(1.75rem, 16.75cqw, 10.25rem);
   }
 
   .works__headline {
@@ -1061,6 +1074,7 @@
   }
 
   .works__annotations-track {
+    display: block;
     grid-column: 1 / -1;
     grid-row: 1;
     position: relative;
@@ -1081,17 +1095,11 @@
     display: none;
   }
 
-  @media (min-width: 48rem) {
-    .works__annotations-track {
-      display: block;
-    }
-
-    #works-slide-0:checked~.works__carousel .works__annotations-panel--0,
-    #works-slide-1:checked~.works__carousel .works__annotations-panel--1,
-    #works-slide-2:checked~.works__carousel .works__annotations-panel--2,
-    #works-slide-3:checked~.works__carousel .works__annotations-panel--3 {
-      display: block;
-    }
+  #works-slide-0:checked~.works__carousel .works__annotations-panel--0,
+  #works-slide-1:checked~.works__carousel .works__annotations-panel--1,
+  #works-slide-2:checked~.works__carousel .works__annotations-panel--2,
+  #works-slide-3:checked~.works__carousel .works__annotations-panel--3 {
+    display: block;
   }
 
   .works__annotation {
@@ -1101,36 +1109,51 @@
     font-size: 2.384cqw;
     line-height: 1.35;
     padding-block: 0.18em;
-    color: var(--color-cream);
     white-space: nowrap;
     overflow: visible;
-    --works-write-progress: 0;
-    clip-path: inset(-0.2em 0 -0.2em calc((1 - var(--works-write-progress, 0)) * 100%));
-    transition: none;
+    color: #fff;
   }
 
-  .works--annotation-write .works__annotation {
-    transition: clip-path 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  .works__annotation-char {
+    opacity: 0;
   }
 
-  .works__annotation.is-written {
-    --works-write-progress: 1;
+  .works__annotation-char.is-visible,
+  .works__annotation.is-written .works__annotation-char {
+    opacity: 1;
   }
 
-  .works__annotation--0 {
+  .works__annotation--slide-0-0 {
     left: -2.5%;
     top: 47.4%;
   }
 
-  .works__annotation--1 {
+  .works__annotation--slide-0-1 {
     left: 91%;
     top: 42.8%;
     transform: translateX(-100%);
   }
 
-  .works__annotation--2 {
+  .works__annotation--slide-0-2 {
     left: 103%;
     top: 78.9%;
+    transform: translateX(-100%);
+  }
+
+  .works__annotation--slide-1-0 {
+    left: 7.5%;
+    top: 52.4%;
+  }
+
+  .works__annotation--slide-1-1 {
+    left: 95%;
+    top: 35%;
+    transform: translateX(-100%);
+  }
+
+  .works__annotation--slide-1-2 {
+    left: 95%;
+    top: 87%;
     transform: translateX(-100%);
   }
 
@@ -1188,7 +1211,6 @@
 
   .works__project-title {
     font-size: 1.5625rem;
-    line-height: 1;
     margin-top: 0;
     margin-bottom: 0;
   }

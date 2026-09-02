@@ -4,13 +4,14 @@ import {
   getWorksHeadlineRevealProgress,
 } from "~/lib/section-scroll-motion.client";
 
-const DESKTOP_LAYOUT = "(min-width: 30rem)";
+const DESKTOP_LAYOUT = "(min-width: 48rem)";
 const ANNOTATIONS_LAYOUT = "(min-width: 48rem)";
 const ANNOTATION_REVEAL_START = 0.25;
 const ANNOTATION_REVEAL_STAGGER = 0.22;
 const ANNOTATION_REVEAL_DURATION = 0.35;
-const SLIDE_WRITE_MS = 850;
-const SLIDE_WRITE_STAGGER_MS = 140;
+const CHAR_WRITE_MS = 28;
+const SLIDE_WRITE_STAGGER_MS = 90;
+const HEADLINE_SLIDE_ANIM_MS = 650;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -36,18 +37,63 @@ function staggeredWriteProgress(reveal: number, index: number) {
   );
 }
 
-function setAnnotationProgress(
+function prepareAnnotationChars(annotation: HTMLElement) {
+  if (annotation.dataset.charsPrepared === "true") return;
+
+  const text = (annotation.textContent ?? "").trim();
+  annotation.textContent = "";
+  annotation.dataset.charsPrepared = "true";
+
+  for (const char of text) {
+    const span = document.createElement("span");
+    span.className = "works__annotation-char";
+    span.textContent = char === " " ? "\u00a0" : char;
+    annotation.appendChild(span);
+  }
+}
+
+if (import.meta.env.DEV) {
+  const probe = document.createElement("span");
+  probe.textContent = "A B";
+  prepareAnnotationChars(probe);
+  console.assert(
+    probe.querySelectorAll(".works__annotation-char").length === 3 &&
+      probe.querySelector(".works__annotation-char")?.textContent === "A" &&
+      probe.children[1]?.textContent === "\u00a0",
+    "works annotation char split",
+  );
+}
+
+function annotationChars(annotation: HTMLElement) {
+  prepareAnnotationChars(annotation);
+  return Array.from(
+    annotation.querySelectorAll<HTMLElement>(".works__annotation-char"),
+  );
+}
+
+function setAnnotationWrite(
   annotation: HTMLElement,
   progress: number,
   written: boolean,
 ) {
-  annotation.style.setProperty("--works-write-progress", String(progress));
-  annotation.classList.toggle("is-written", written);
+  const chars = annotationChars(annotation);
+  const visibleCount = written
+    ? chars.length
+    : Math.min(chars.length, Math.floor(progress * chars.length));
+
+  for (let index = 0; index < chars.length; index++) {
+    chars[index].classList.toggle("is-visible", index < visibleCount);
+  }
+
+  annotation.classList.toggle("is-written", written || visibleCount >= chars.length);
 }
 
 function resetAnnotations(annotations: HTMLElement[]) {
   for (const annotation of annotations) {
-    setAnnotationProgress(annotation, 0, false);
+    for (const char of annotation.querySelectorAll<HTMLElement>(".works__annotation-char")) {
+      char.classList.remove("is-visible");
+    }
+    annotation.classList.remove("is-written");
   }
 }
 
@@ -64,8 +110,12 @@ export function initWorksStageMotion(section: HTMLElement) {
   const allAnnotations = Array.from(
     section.querySelectorAll<HTMLElement>(".works__annotation"),
   );
+  for (const annotation of allAnnotations) {
+    prepareAnnotationChars(annotation);
+  }
   const writtenSlides = new Set<number>();
   let slideWriteTimers: number[] = [];
+  let headlineAnimRaf = 0;
   let stageRevealed = false;
   let initialScrollY: number | null = null;
   let allowFigureDownPose = false;
@@ -81,6 +131,15 @@ export function initWorksStageMotion(section: HTMLElement) {
   const headlinePanels = Array.from(
     section.querySelectorAll<HTMLElement>(".works__headline-panel"),
   );
+
+  const getHeadlinePanel = (slideIndex: number) =>
+    section.querySelector<HTMLElement>(`.works__headline-panel--${slideIndex}`) ??
+    headlineTrack;
+
+  const cancelHeadlineAnim = () => {
+    cancelAnimationFrame(headlineAnimRaf);
+    headlineAnimRaf = 0;
+  };
 
   const setHeadlineReveal = (
     reveal: number,
@@ -110,6 +169,44 @@ export function initWorksStageMotion(section: HTMLElement) {
     }
   };
 
+  const animateHeadlineOnSlideChange = (
+    slideIndex: number,
+    viewportHeight: number,
+  ) => {
+    cancelHeadlineAnim();
+
+    if (reducedMotion) {
+      setHeadlineReveal(1, slideIndex, viewportHeight);
+      headlineTrack.classList.add("is-revealed");
+      section.classList.add("works--stage-revealed");
+      stageRevealed = true;
+      return;
+    }
+
+    const animStart = performance.now();
+
+    const tick = (now: number) => {
+      const t = clamp((now - animStart) / HEADLINE_SLIDE_ANIM_MS, 0, 1);
+      const reveal = easeOutCubic(t);
+
+      setHeadlineReveal(reveal, slideIndex, viewportHeight);
+      headlineTrack.classList.toggle("is-revealed", reveal >= 1);
+      section.classList.toggle("works--stage-revealed", reveal >= 1);
+
+      if (t < 1) {
+        headlineAnimRaf = requestAnimationFrame(tick);
+        return;
+      }
+
+      headlineAnimRaf = 0;
+      stageRevealed = true;
+    };
+
+    setHeadlineReveal(0, slideIndex, viewportHeight);
+    headlineTrack.classList.remove("is-revealed");
+    headlineAnimRaf = requestAnimationFrame(tick);
+  };
+
   const setFigureRise = (reveal: number, slideIndex: number) => {
     if (!slide0Visual) return;
 
@@ -136,6 +233,7 @@ export function initWorksStageMotion(section: HTMLElement) {
 
   const clear = () => {
     clearSlideWriteTimers();
+    cancelHeadlineAnim();
     stageRevealed = false;
     writtenSlides.clear();
     headlineTrack.classList.remove("is-revealed");
@@ -162,12 +260,26 @@ export function initWorksStageMotion(section: HTMLElement) {
 
   const writeAnnotationsInstant = (annotations: HTMLElement[]) => {
     for (const annotation of annotations) {
-      setAnnotationProgress(annotation, 1, true);
+      setAnnotationWrite(annotation, 1, true);
     }
   };
 
+  const animateAnnotationChars = (annotation: HTMLElement, startDelay: number) => {
+    const chars = annotationChars(annotation);
+
+    chars.forEach((char, charIndex) => {
+      slideWriteTimers.push(
+        window.setTimeout(() => {
+          char.classList.add("is-visible");
+        }, startDelay + charIndex * CHAR_WRITE_MS),
+      );
+    });
+
+    return startDelay + Math.max(chars.length - 1, 0) * CHAR_WRITE_MS;
+  };
+
   const animateSlideWrite = (slideIndex: number) => {
-    if (!annotationsLayout.matches || writtenSlides.has(slideIndex)) return;
+    if (!annotationsLayout.matches) return;
 
     const annotations = Array.from(
       section.querySelector<HTMLElement>(
@@ -179,27 +291,33 @@ export function initWorksStageMotion(section: HTMLElement) {
 
     clearSlideWriteTimers();
     resetAnnotations(allAnnotations);
-    writtenSlides.add(slideIndex);
+    writtenSlides.delete(slideIndex);
 
     if (reducedMotion) {
       writeAnnotationsInstant(annotations);
+      writtenSlides.add(slideIndex);
       return;
     }
 
     section.classList.add("works--annotation-write");
 
+    let writeEnd = 0;
+
     annotations.forEach((annotation, index) => {
-      slideWriteTimers.push(
-        window.setTimeout(() => {
-          setAnnotationProgress(annotation, 1, true);
-        }, index * SLIDE_WRITE_STAGGER_MS),
+      writeEnd = Math.max(
+        writeEnd,
+        animateAnnotationChars(annotation, index * SLIDE_WRITE_STAGGER_MS),
       );
     });
 
     slideWriteTimers.push(
       window.setTimeout(() => {
         section.classList.remove("works--annotation-write");
-      }, (annotations.length - 1) * SLIDE_WRITE_STAGGER_MS + SLIDE_WRITE_MS),
+        for (const annotation of annotations) {
+          annotation.classList.add("is-written");
+        }
+        writtenSlides.add(slideIndex);
+      }, writeEnd + CHAR_WRITE_MS),
     );
   };
 
@@ -208,7 +326,7 @@ export function initWorksStageMotion(section: HTMLElement) {
 
     for (const annotation of allAnnotations) {
       if (!visibleAnnotations.includes(annotation)) {
-        setAnnotationProgress(annotation, 0, false);
+        setAnnotationWrite(annotation, 0, false);
       }
     }
 
@@ -218,7 +336,7 @@ export function initWorksStageMotion(section: HTMLElement) {
 
     visibleAnnotations.forEach((annotation, index) => {
       const progress = reveal >= 1 ? 1 : staggeredWriteProgress(reveal, index);
-      setAnnotationProgress(annotation, progress, progress >= 0.999);
+      setAnnotationWrite(annotation, progress, progress >= 0.999);
     });
 
     if (reveal >= 1) {
@@ -242,21 +360,22 @@ export function initWorksStageMotion(section: HTMLElement) {
 
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
     const slideIndex = getCheckedSlideIndex();
-    const headlinePanel =
-      section.querySelector<HTMLElement>(`.works__headline-panel--${slideIndex}`) ??
-      headlineTrack;
+    const headlinePanel = getHeadlinePanel(slideIndex);
     const reveal = reducedMotion
       ? 1
       : getWorksHeadlineRevealProgress(headlinePanel, viewportHeight);
 
-    setHeadlineReveal(reveal, slideIndex, viewportHeight);
-    setFigureRise(reveal, slideIndex);
-    headlineTrack.classList.toggle("is-revealed", reveal >= 1);
-    section.classList.toggle("works--stage-revealed", reveal >= 1);
+    if (!headlineAnimRaf) {
+      setHeadlineReveal(reveal, slideIndex, viewportHeight);
+      headlineTrack.classList.toggle("is-revealed", reveal >= 1);
+      section.classList.toggle("works--stage-revealed", reveal >= 1);
 
-    if (reveal >= 1) {
-      stageRevealed = true;
+      if (reveal >= 1) {
+        stageRevealed = true;
+      }
     }
+
+    setFigureRise(reveal, slideIndex);
 
     applyScrollAnnotations(reveal, slideIndex);
   };
@@ -266,18 +385,18 @@ export function initWorksStageMotion(section: HTMLElement) {
 
     if (!desktopLayout.matches) return;
 
-    if (stageRevealed && !writtenSlides.has(slideIndex)) {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const scrollReveal = reducedMotion
+      ? 1
+      : getWorksHeadlineRevealProgress(getHeadlinePanel(slideIndex), viewportHeight);
+    const stageReady = stageRevealed || scrollReveal >= 1;
+
+    if (stageReady) {
+      animateHeadlineOnSlideChange(slideIndex, viewportHeight);
       animateSlideWrite(slideIndex);
-      return;
+    } else {
+      update();
     }
-
-    if (writtenSlides.has(slideIndex)) {
-      clearSlideWriteTimers();
-      resetAnnotations(allAnnotations);
-      writeAnnotationsInstant(activeAnnotations());
-    }
-
-    update();
   };
 
   const onLayoutChange = () => {
@@ -310,6 +429,7 @@ export function initWorksStageMotion(section: HTMLElement) {
     cleanupScroll();
     window.removeEventListener("pageshow", resyncAfterRestore);
     clearSlideWriteTimers();
+    cancelHeadlineAnim();
     clear();
 
     for (const radio of radios) {

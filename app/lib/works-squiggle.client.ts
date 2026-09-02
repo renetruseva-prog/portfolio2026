@@ -3,7 +3,7 @@ import {
   getWorksRevealProgress,
 } from "~/lib/section-scroll-motion.client";
 
-const DESKTOP_LAYOUT = "(min-width: 30rem)";
+const DESKTOP_LAYOUT = "(min-width: 48rem)";
 const SQUIGGLE_START_ID = "hero-squiggle-start";
 
 /** Figma Vector 588 — the path runs from the Works “s” (bottom-left) to the RUSEVA “A” foot (top-right). */

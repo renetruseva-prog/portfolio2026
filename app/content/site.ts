@@ -44,6 +44,8 @@ export const heroAssets = {
 export type WorkProject = {
   id: string;
   title: string;
+  headlineLead?: string;
+  headlineAccent?: string;
   tags: readonly string[];
   href: string;
   ctaLabel: string;
@@ -265,7 +267,9 @@ export const worksProjects: WorkProject[] = [
   {
     id: "project2",
     title: "Memome - Discover Antwerp",
-    tags: ["Creative Code", "UI/UX", "Teamwork"],
+    headlineLead: "Memome app -",
+    headlineAccent: "Interactive map",
+    tags: ["UX/UI", "Teamwork", "Creative Code"],
     href: "/works/project2",
     ctaLabel: "See more",
   },

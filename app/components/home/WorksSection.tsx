@@ -1,7 +1,12 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Link } from "react-router";
 
-import { worksAssets, worksHeroSquiggle, worksProjects } from "~/content/site";
+import {
+  worksAssets,
+  worksHeroSquiggle,
+  worksProjects,
+  type WorkProject,
+} from "~/content/site";
 import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
 import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
 import { initWorksMealsIntro } from "~/lib/works-meals.client";
@@ -31,6 +36,14 @@ const ANNOTATION_SLOTS = [
   "works__annotation--2",
 ] as const;
 
+function annotationClass(slideIndex: number, slotIndex: number) {
+  return [
+    "works__annotation",
+    ANNOTATION_SLOTS[slotIndex] ?? ANNOTATION_SLOTS[0],
+    `works__annotation--slide-${slideIndex}-${slotIndex}`,
+  ].join(" ");
+}
+
 /** Slide 1 tag order in Figma: Creative Code, UX/UI, Design */
 const SLIDE_ONE_ANNOTATION_ORDER = [0, 2, 1] as const;
 
@@ -47,6 +60,16 @@ function splitProjectHeadline(title: string): [string, string] {
   }
   const accent = words.pop()!;
   return [words.join(" ").toUpperCase(), accent.toUpperCase()];
+}
+
+function projectHeadline(project: WorkProject): [string, string] {
+  if (project.headlineLead) {
+    return [
+      project.headlineLead.toUpperCase(),
+      (project.headlineAccent ?? "").toUpperCase(),
+    ];
+  }
+  return splitProjectHeadline(project.title);
 }
 
 export function WorksSection() {
@@ -170,7 +193,7 @@ export function WorksSection() {
                 <div className="works__visual-track">
                   <div className="works__headline-track" aria-hidden="true">
                     {worksProjects.map((project, index) => {
-                      const [lead, accent] = splitProjectHeadline(project.title);
+                      const [lead, accent] = projectHeadline(project);
                       return (
                         <p
                           key={project.id}
@@ -418,7 +441,7 @@ export function WorksSection() {
                 {annotationTagOrder(index, project.tags.length).map((tagIndex, slotIndex) => (
                   <span
                     key={project.tags[tagIndex]}
-                    className={`works__annotation ${ANNOTATION_SLOTS[slotIndex] ?? ANNOTATION_SLOTS[0]}`}
+                    className={annotationClass(index, slotIndex)}
                   >
                     {project.tags[tagIndex]}
                   </span>
