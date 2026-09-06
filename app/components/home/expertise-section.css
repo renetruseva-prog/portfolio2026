@@ -113,10 +113,6 @@
     padding: 3rem 0 6rem;
   }
 
-  .expertise__title {
-    font-size: clamp(4rem, 6vw, 5.625rem);
-  }
-
   .expertise__list {
     gap: 3.5rem;
   }
@@ -127,7 +123,7 @@
   }
 
   .expertise__index-label {
-    font-size: 1rem;
+    font-size: 1.25rem;
   }
 
   .expertise__lead {
@@ -145,6 +141,36 @@
 
   .expertise__skill-line {
     font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 30rem) and (max-width: 47.99rem) {
+  .expertise__index {
+    display: none;
+  }
+
+  .expertise__lead {
+    grid-template-columns: 1fr;
+  }
+
+  .expertise__intro {
+    margin-left: 0;
+  }
+
+  .expertise__skills {
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 30rem) and (max-width: 63.99rem) {
+  .expertise__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3.5rem clamp(2rem, 4vw, 4.5rem);
+  }
+
+  .expertise__item {
+    min-width: 0;
   }
 }
 
