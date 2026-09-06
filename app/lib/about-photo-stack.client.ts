@@ -1,3 +1,5 @@
+import { bindScrollMotion } from "~/lib/section-scroll-motion.client";
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -17,6 +19,7 @@ function getStickyTop(pin: HTMLElement) {
 
 const TRANSITION_PORTION = 0.16;
 const SCROLL_SPEED = 1.5625;
+const TABLET_LAYOUT = "(min-width: 48rem)";
 
 type PhotoStackState = {
   activeIndex: number;
@@ -24,19 +27,44 @@ type PhotoStackState = {
 };
 
 type ScrollZone = {
-  title: HTMLElement;
+  section: HTMLElement;
+  titleWrap: HTMLElement;
   stack: HTMLElement;
   pin: HTMLElement;
 };
 
+function pageY(el: HTMLElement) {
+  return el.getBoundingClientRect().top + window.scrollY;
+}
+
+function getZoneStart(titleWrap: HTMLElement, pin: HTMLElement) {
+  const stickyTop = getStickyTop(pin);
+
+  if (!window.matchMedia(TABLET_LAYOUT).matches) {
+    return titleWrap.offsetTop - stickyTop;
+  }
+
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  return pageY(titleWrap) - viewportHeight * 0.3;
+}
+
+function getZoneEnd({ section, stack, pin }: ScrollZone) {
+  const stickyTop = getStickyTop(pin);
+
+  if (!window.matchMedia(TABLET_LAYOUT).matches) {
+    return stack.offsetTop + stack.offsetHeight - stickyTop;
+  }
+
+  return pageY(section) + section.offsetHeight - stickyTop;
+}
+
 function getScrollPhotoState(
-  { title, stack, pin }: ScrollZone,
+  scrollZone: ScrollZone,
   photoCount: number,
   scrollY: number,
 ): PhotoStackState {
-  const stickyTop = getStickyTop(pin);
-  const zoneStart = title.offsetTop - stickyTop;
-  const zoneEnd = stack.offsetTop + stack.offsetHeight - stickyTop;
+  const zoneStart = getZoneStart(scrollZone.titleWrap, scrollZone.pin);
+  const zoneEnd = getZoneEnd(scrollZone);
   const zoneHeight = Math.max(zoneEnd - zoneStart, 1);
 
   if (scrollY <= zoneStart) {
@@ -83,14 +111,14 @@ function triggerBackdropSwitch(backdrop: HTMLElement) {
 }
 
 export function initAboutPhotoStack(section: HTMLElement) {
-  const title = section.querySelector<HTMLElement>(".about__title");
+  const titleWrap = section.querySelector<HTMLElement>(".about__title-wrap");
   const stack = section.querySelector<HTMLElement>(".about__stack");
   const pin = section.querySelector<HTMLElement>(".about__stack-pin");
   const backdrop = section.querySelector<HTMLElement>(".about__stack-backdrop");
   const photos = Array.from(section.querySelectorAll<HTMLElement>(".about__photo"));
   const photoCount = photos.length;
 
-  if (!title || !stack || !pin || !backdrop || photoCount === 0) {
+  if (!titleWrap || !stack || !pin || !backdrop || photoCount === 0) {
     return () => {};
   }
 
@@ -99,7 +127,8 @@ export function initAboutPhotoStack(section: HTMLElement) {
     return () => {};
   }
 
-  const scrollZone: ScrollZone = { title, stack, pin };
+  const scrollZone: ScrollZone = { section, titleWrap, stack, pin };
+  const reducedMotion = false;
 
   let disposed = false;
   let rafId = 0;
@@ -131,7 +160,16 @@ export function initAboutPhotoStack(section: HTMLElement) {
 
   const scheduleUpdate = () => {
     cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(update);
+    rafId = requestAnimationFrame(() => {
+      if (tapIndex !== null) {
+        const { activeIndex } = getScrollPhotoState(scrollZone, photoCount, window.scrollY);
+        if (activeIndex !== tapIndex) {
+          tapIndex = null;
+        }
+      }
+
+      update();
+    });
   };
 
   const advancePhoto = () => {
@@ -139,17 +177,6 @@ export function initAboutPhotoStack(section: HTMLElement) {
       tapIndex ?? getScrollPhotoState(scrollZone, photoCount, window.scrollY).activeIndex;
     tapIndex = (current + 1) % photoCount;
     update();
-  };
-
-  const onScroll = () => {
-    if (tapIndex !== null) {
-      const { activeIndex } = getScrollPhotoState(scrollZone, photoCount, window.scrollY);
-      if (activeIndex !== tapIndex) {
-        tapIndex = null;
-      }
-    }
-
-    scheduleUpdate();
   };
 
   const onPinClick = () => {
@@ -167,22 +194,19 @@ export function initAboutPhotoStack(section: HTMLElement) {
 
   pin.addEventListener("click", onPinClick);
   pin.addEventListener("keydown", onPinKeyDown);
-  window.addEventListener("scroll", onScroll, { passive: true, capture: true });
-  window.addEventListener("resize", scheduleUpdate, { passive: true });
-  window.visualViewport?.addEventListener("scroll", onScroll, { passive: true });
-  window.visualViewport?.addEventListener("resize", scheduleUpdate, { passive: true });
+  const cleanupScroll = bindScrollMotion(scheduleUpdate, reducedMotion);
+  const observer = new ResizeObserver(scheduleUpdate);
+  observer.observe(section);
 
   return () => {
     disposed = true;
     cancelAnimationFrame(rafId);
+    cleanupScroll();
+    observer.disconnect();
     backdrop.removeEventListener("animationend", onBackdropAnimationEnd);
     backdrop.classList.remove("is-switching");
     pin.removeEventListener("click", onPinClick);
     pin.removeEventListener("keydown", onPinKeyDown);
-    window.removeEventListener("scroll", onScroll, true);
-    window.removeEventListener("resize", scheduleUpdate);
-    window.visualViewport?.removeEventListener("scroll", onScroll);
-    window.visualViewport?.removeEventListener("resize", scheduleUpdate);
 
     for (const photo of photos) {
       photo.style.removeProperty("opacity");

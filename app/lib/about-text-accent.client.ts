@@ -4,8 +4,11 @@ function clamp(value: number, min: number, max: number) {
 
 function getLineRevealProgress(line: HTMLElement, viewportHeight: number) {
   const rect = line.getBoundingClientRect();
-  const revealStart = viewportHeight * 0.9;
-  const revealEnd = viewportHeight * 0.58;
+  const isTabletFlow = window.matchMedia(
+    "(min-width: 48rem) and (max-width: 63.99rem)",
+  ).matches;
+  const revealStart = viewportHeight * (isTabletFlow ? 1 : 0.9);
+  const revealEnd = viewportHeight * (isTabletFlow ? 0.83 : 0.58);
 
   return clamp((revealStart - rect.top) / Math.max(revealStart - revealEnd, 1), 0, 1);
 }
@@ -68,6 +71,17 @@ export function initAboutTextAccent(section: HTMLElement) {
         highlight.classList.add("is-revealed");
       }
     }
+
+    const quoteText = section.querySelector<HTMLElement>(".about__quote-text");
+    if (quoteText) {
+      quoteText.style.setProperty("--line-progress", "1");
+      quoteText.classList.add("is-revealed");
+      const highlight = quoteText.querySelector<HTMLElement>(".about__highlight");
+      if (highlight) {
+        highlight.style.setProperty("--highlight-draw", "1");
+        highlight.classList.add("is-revealed");
+      }
+    }
     return () => {};
   }
 
@@ -121,6 +135,21 @@ export function initAboutTextAccent(section: HTMLElement) {
         highlight.classList.remove("is-revealed");
       }
     }
+
+    const quoteText = section.querySelector<HTMLElement>(".about__quote-text");
+    if (quoteText && quoteText.querySelector(".about__quote-line") === null) {
+      const progress = getLineRevealProgress(quoteText, viewportHeight);
+
+      quoteText.style.setProperty("--line-progress", String(progress));
+      quoteText.classList.toggle("is-revealed", progress >= 1);
+
+      const highlight = quoteText.querySelector<HTMLElement>(".about__highlight");
+      if (highlight) {
+        const draw = getHighlightDraw(progress);
+        highlight.style.setProperty("--highlight-draw", String(draw));
+        highlight.classList.toggle("is-revealed", draw >= 1);
+      }
+    }
   };
 
   const scheduleUpdate = () => {
@@ -157,6 +186,18 @@ export function initAboutTextAccent(section: HTMLElement) {
 
       highlight.style.removeProperty("--highlight-draw");
       highlight.classList.remove("is-revealed");
+    }
+
+    const quoteText = section.querySelector<HTMLElement>(".about__quote-text");
+    if (quoteText) {
+      quoteText.style.removeProperty("--line-progress");
+      quoteText.classList.remove("is-revealed");
+
+      const highlight = quoteText.querySelector<HTMLElement>(".about__highlight");
+      if (highlight) {
+        highlight.style.removeProperty("--highlight-draw");
+        highlight.classList.remove("is-revealed");
+      }
     }
   };
 }
