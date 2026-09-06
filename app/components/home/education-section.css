@@ -134,10 +134,6 @@
     padding-bottom: 6rem;
   }
 
-  .education__title {
-    font-size: clamp(4rem, 6vw, 5.625rem);
-  }
-
   .education__list {
     max-width: 40rem;
   }
