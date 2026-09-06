@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 
 import { aboutAssets, aboutContent, site } from "~/content/site";
+import { initAboutDecorativeLineDraw } from "~/lib/about-decorative-line.client";
 import { initAboutPhotoStack } from "~/lib/about-photo-stack.client";
 import { initAboutQuoteLines } from "~/lib/about-quote-lines.client";
 import { initAboutTextAccent } from "~/lib/about-text-accent.client";
@@ -55,18 +56,42 @@ function renderQuote(text: string, highlight: string, maskId: string): ReactNode
 
   const before = text.slice(0, phraseIndex);
   const after = text.slice(phraseIndex + phrase.length);
+  const headMatch = before.match(/^([\s\S]*\nbecause I)\n$/);
+
+  if (!headMatch) {
+    return (
+      <>
+        {before}
+        <span className="about__quote-phrase">
+          like{" "}
+          <span className="about__highlight">
+            {highlight}
+            <HighlightMark maskId={maskId} />
+          </span>
+        </span>
+        {after}
+      </>
+    );
+  }
 
   return (
     <>
-      {before}
+      {headMatch[1].replace(/\nbecause I$/, "")}
+      {"\n"}
+      <span className="about__quote-like-mobile">because I</span>
+      <span className="about__quote-break about__quote-break--mobile" aria-hidden="true" />
+      <span className="about__quote-like-desktop">because I like </span>
+      <span className="about__quote-break about__quote-break--desktop" aria-hidden="true" />
       <span className="about__quote-phrase">
-        like{" "}
-        <span className="about__highlight">
-          {highlight}
-          <HighlightMark maskId={maskId} />
+        <span className="about__quote-like-mobile">like </span>
+        <span className="about__quote-tail">
+          <span className="about__highlight">
+            {highlight}
+            <HighlightMark maskId={maskId} />
+          </span>
+          {after}
         </span>
       </span>
-      {after}
     </>
   );
 }
@@ -82,11 +107,13 @@ export function AboutSection() {
     const cleanupPhotoStack = initAboutPhotoStack(section);
     const cleanupQuoteLines = initAboutQuoteLines(section);
     const cleanupTextAccent = initAboutTextAccent(section);
+    const cleanupDecorativeLine = initAboutDecorativeLineDraw(section);
 
     return () => {
       cleanupPhotoStack();
       cleanupQuoteLines();
       cleanupTextAccent();
+      cleanupDecorativeLine();
     };
   }, []);
 
@@ -97,9 +124,11 @@ export function AboutSection() {
       className="about"
       aria-labelledby="about-title"
     >
-      <h2 id="about-title" className="about__title display-title">
-        About me
-      </h2>
+      <div className="about__title-wrap">
+        <h2 id="about-title" className="about__title display-title">
+          About me
+        </h2>
+      </div>
 
       <div className="about__stack">
         <div

@@ -198,6 +198,26 @@
   text-transform: none;
 }
 
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  .about__quote {
+    padding: 2rem;
+  }
+
+  .about__quote-text {
+    --line-progress: 0;
+    max-width: none;
+    width: 100%;
+    text-align: center;
+    opacity: var(--line-progress);
+    transform: translate3d(0, calc((1 - var(--line-progress)) * 1rem), 0);
+    will-change: opacity, transform;
+  }
+
+  .about__quote-text.is-revealed {
+    --line-progress: 1;
+  }
+}
+
 .about__quote-line {
   display: block;
   --line-progress: 0;
@@ -221,6 +241,45 @@
 
 .about__quote-phrase {
   white-space: nowrap;
+}
+
+.about__quote-like-mobile {
+  display: inline;
+}
+
+.about__quote-like-desktop {
+  display: none;
+  white-space: nowrap;
+}
+
+.about__quote-break--mobile {
+  display: block;
+}
+
+.about__quote-break--desktop {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .about__quote-phrase {
+    white-space: normal;
+  }
+
+  .about__quote-like-mobile {
+    display: none;
+  }
+
+  .about__quote-like-desktop {
+    display: inline;
+  }
+
+  .about__quote-break--mobile {
+    display: none;
+  }
+
+  .about__quote-break--desktop {
+    display: block;
+  }
 }
 
 .about__highlight {
@@ -258,39 +317,56 @@
 
 .about__highlight-mark__stroke--inner {
   stroke-width: 46;
-  stroke-dashoffset: calc(
-    1 - clamp(0, (var(--highlight-draw, 0) - 0.1) / 0.9, 1)
-  );
+  stroke-dashoffset: calc(1 - clamp(0, (var(--highlight-draw, 0) - 0.1) / 0.9, 1));
 }
 
 .about__highlight.is-revealed {
   --highlight-draw: 1;
 }
 
-@media (min-width: 30rem) {
+@media (min-width: 48rem) {
   .about {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(12rem, 15.4rem) minmax(0, 1fr);
     grid-template-areas:
       "title title title"
-      "quote stack content";
+      "stack content content"
+      "quote quote quote";
     column-gap: clamp(2rem, 4vw, 4.5rem);
     row-gap: clamp(2.5rem, 5vw, 4rem);
     align-items: start;
     padding: 5rem 0 3rem;
+    overflow: visible;
+  }
+
+  .about__title-wrap {
+    position: relative;
+    z-index: 2;
+    grid-area: title;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    padding-top: 4rem;
+    overflow: visible;
+    font-size: clamp(4rem, 6vw, 5.625rem);
+    container-type: inline-size;
+    --about-line-scale: min(1, 100cqi / 76.5625rem);
   }
 
   .about__title {
-    grid-area: title;
-    justify-self: center;
+    position: relative;
+    z-index: 1;
+    width: fit-content;
+    font-size: 1em;
     text-align: center;
-    font-size: clamp(4rem, 6vw, 5.625rem);
   }
 
   .about__quote {
     grid-area: quote;
     margin: 0;
-    align-self: center;
+    align-self: start;
   }
 
   .about__stack {
@@ -303,31 +379,131 @@
   }
 
   .about__stack-stage {
-    width: min(100%, 15.4rem);
+    width: 15.4rem;
   }
 
   .about__content {
     grid-area: content;
-    align-self: center;
+    align-self: start;
     gap: 1.5rem;
   }
 
   .about__intro-heading {
-    font-size: clamp(2.75rem, 4vw, 4rem);
+    font-size: clamp(1.875rem, 2vw, 2.5rem);
   }
 
   .about__paragraph {
     font-size: 1.25rem;
-    max-width: 34rem;
+    max-width: none;
+    text-align: left;
   }
 
   .about__quote-text {
     font-size: clamp(2.75rem, 4.5vw, 4.25rem);
-    max-width: 10em;
   }
 
   .about__highlight-mark {
     width: 3.875em;
+  }
+}
+
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  .about {
+    grid-template-columns: minmax(12rem, 15.4rem) minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 4rem;
+  }
+
+  .about__title-wrap {
+    justify-content: start;
+  }
+
+  .about__title {
+    text-align: left;
+  }
+}
+
+@media (min-width: 64rem) {
+  .about {
+    grid-template-columns: minmax(0, 1.05fr) minmax(12rem, 15.4rem) minmax(0, 1fr);
+    grid-template-areas:
+      "title title title"
+      "quote stack content";
+  }
+
+  .about__title-wrap {
+    justify-content: center;
+  }
+
+  .about__title {
+    text-align: center;
+  }
+
+  .about__quote {
+    align-self: center;
+    padding: 2rem;
+  }
+
+  .about__quote-text {
+    max-width: 10em;
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+
+  .about__quote-tail {
+    white-space: nowrap;
+  }
+
+  .about__content {
+    align-self: center;
+  }
+
+  .about__paragraph {
+    max-width: 34rem;
+    text-align: justify;
+  }
+}
+
+@media (min-width: 1140px) {
+  .about__title {
+    --squiggle-draw: 0;
+  }
+
+  .about__title.is-revealed {
+    --squiggle-draw: 1;
+  }
+
+  .about__title::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: calc((100% - 100cqi) / 2 - 12rem * var(--about-line-scale, 1));
+    top: -223%;
+    width: 50cqi;
+    aspect-ratio: 802.2 / 241;
+    transform-origin: 0 0;
+    pointer-events: none;
+    background-color: var(--color-text);
+    -webkit-mask-image:
+      linear-gradient(to right,
+        #000 0%,
+        #000 calc(var(--squiggle-draw, 0) * 100%),
+        transparent calc(var(--squiggle-draw, 0) * 100%)),
+      url("/images/portfolio/about-me/decorative_line_aboutMe_desktop.svg");
+    mask-image:
+      linear-gradient(to right,
+        #000 0%,
+        #000 calc(var(--squiggle-draw, 0) * 100%),
+        transparent calc(var(--squiggle-draw, 0) * 100%)),
+      url("/images/portfolio/about-me/decorative_line_aboutMe_desktop.svg");
+    -webkit-mask-size: 100% 100%, 100% 100%;
+    mask-size: 100% 100%, 100% 100%;
+    -webkit-mask-repeat: no-repeat, no-repeat;
+    mask-repeat: no-repeat, no-repeat;
+    -webkit-mask-position: left center, left center;
+    mask-position: left center, left center;
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
   }
 }
 
@@ -359,6 +535,12 @@
   }
 
   .about__quote-line {
+    --line-progress: 1;
+    opacity: 1;
+    transform: none;
+  }
+
+  .about__quote-text {
     --line-progress: 1;
     opacity: 1;
     transform: none;

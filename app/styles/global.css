@@ -96,9 +96,10 @@ button {
   color: var(--color-muted);
 }
 
+/* No overflow clip here: html/body already block horizontal scroll, and clipping at the
+   centered max-width box would cut full-bleed decorations short of the viewport edge. */
 .page-main {
   padding: 0 1rem;
-  overflow-x: hidden;
 }
 
 .home-section-divider {
