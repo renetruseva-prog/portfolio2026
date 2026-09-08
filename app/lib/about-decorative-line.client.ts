@@ -1,27 +1,12 @@
-import { bindScrollMotion } from "~/lib/section-scroll-motion.client";
+import {
+  bindScrollMotion,
+  getDecorativeLineRevealProgress,
+} from "~/lib/section-scroll-motion.client";
 
 const DESKTOP_LAYOUT = "(min-width: 1140px)";
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
-
 function easeOutCubic(value: number) {
   return 1 - Math.pow(1 - value, 3);
-}
-
-function getAboutRevealProgress(section: HTMLElement, viewportHeight: number) {
-  const titleWrap =
-    section.querySelector<HTMLElement>(".about__title-wrap") ?? section;
-  const titleTop = titleWrap.getBoundingClientRect().top;
-  const revealStart = viewportHeight * 1.06;
-  const revealEnd = viewportHeight * 0.34;
-
-  return clamp(
-    (revealStart - titleTop) / Math.max(revealStart - revealEnd, 1),
-    0,
-    1,
-  );
 }
 
 export function initAboutDecorativeLineDraw(section: HTMLElement) {
@@ -40,9 +25,11 @@ export function initAboutDecorativeLineDraw(section: HTMLElement) {
 
     const viewportHeight =
       window.innerHeight || document.documentElement.clientHeight;
+    const titleWrap =
+      section.querySelector<HTMLElement>(".about__title-wrap") ?? section;
     const draw = reducedMotion
       ? 1
-      : easeOutCubic(getAboutRevealProgress(section, viewportHeight));
+      : easeOutCubic(getDecorativeLineRevealProgress(titleWrap, viewportHeight));
 
     title.style.setProperty("--squiggle-draw", String(draw));
     title.classList.toggle("is-revealed", draw >= 1);

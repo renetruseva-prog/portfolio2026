@@ -62,7 +62,7 @@ export function SiteHeader() {
       className={`site-header${isMenuOpen ? " site-header--menu-open" : ""}`}
     >
       <div className="site-header__bar">
-        <a href="/" aria-label="Home" className="site-header__logo">
+        <a href="/#main" aria-label="Home" className="site-header__logo">
           <img
             alt=""
             src={headerAssets.logoFrame}

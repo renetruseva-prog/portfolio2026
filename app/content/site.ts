@@ -8,7 +8,7 @@ export const site = {
     { label: "Contact me", href: "/#contact" },
   ],
   mobileMenuLinks: [
-    { label: "Home", href: "/" },
+    { label: "Home", href: "/#main" },
     { label: "Works", href: "/#works" },
     { label: "About", href: "/#about" },
     { label: "Contacts", href: "/#contact" },
@@ -242,7 +242,7 @@ export const footerContent = {
   exploreTitle: "Explore",
   contactTitle: "Contacts",
   exploreLinks: [
-    { label: "Home", href: "/" },
+    { label: "Home", href: "/#main" },
     { label: "Works", href: "/#works" },
     { label: "About", href: "/#about" },
   ],

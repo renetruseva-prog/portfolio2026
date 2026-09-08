@@ -6,6 +6,46 @@ function easeOutCubic(value: number) {
   return 1 - Math.pow(1 - value, 3);
 }
 
+function getDecorativeLineRevealProgressFromY(
+  anchorY: number,
+  viewportHeight: number,
+  startRatio = 1.06,
+  endRatio = 0.34,
+) {
+  const revealStart = viewportHeight * startRatio;
+  const revealEnd = viewportHeight * endRatio;
+
+  return clamp(
+    (revealStart - anchorY) / Math.max(revealStart - revealEnd, 1),
+    0,
+    1,
+  );
+}
+
+function getHomeDetailsEndBottom() {
+  const details = document.querySelector(".home-details");
+  if (!details) return null;
+
+  let maxBottom = -Infinity;
+  for (const section of details.querySelectorAll<HTMLElement>(
+    ":scope > .expertise, :scope > .languages, :scope > .education",
+  )) {
+    maxBottom = Math.max(maxBottom, section.getBoundingClientRect().bottom);
+  }
+
+  return Number.isFinite(maxBottom) ? maxBottom : null;
+}
+
+export function getDecorativeLineRevealProgress(
+  anchor: HTMLElement,
+  viewportHeight: number,
+) {
+  return getDecorativeLineRevealProgressFromY(
+    anchor.getBoundingClientRect().top,
+    viewportHeight,
+  );
+}
+
 export function getWorksRevealProgress(
   section: HTMLElement,
   viewportHeight: number,
@@ -275,31 +315,88 @@ export function initEducationMotion(section: HTMLElement) {
 
 export function initFooterMotion(section: HTMLElement) {
   const frame = section.querySelector<HTMLElement>(".footer__frame");
-  const heading = section.querySelector<HTMLElement>(".footer__heading");
+  const line = section.querySelector<HTMLElement>(".footer__decorative-line");
+  const trigger =
+    section.querySelector<HTMLElement>(".footer__heading-highlight") ??
+    section.querySelector<HTMLElement>(".footer__heading") ??
+    section;
 
-  if (!frame) {
+  if (!frame && !line) {
     return () => {};
   }
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const trigger = heading ?? section;
 
   const update = () => {
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    const progress = reducedMotion
-      ? 1
-      : easeOutCubic(getRevealProgress(trigger, viewportHeight, 0.7, 0.3));
 
-    frame.style.setProperty("--frame-progress", String(progress));
-    frame.classList.toggle("is-revealed", progress >= 1);
+    if (frame) {
+      const progress = reducedMotion
+        ? 1
+        : easeOutCubic(getRevealProgress(trigger, viewportHeight, 0.9, 0.58));
+
+      frame.style.setProperty("--frame-progress", String(progress));
+      frame.classList.toggle("is-revealed", progress >= 1);
+    }
+
+    if (line) {
+      // The line trails the details section, so its window starts where that section's
+      // end clears the fold — otherwise the draw finishes before the line is on screen.
+      // Progress stays linear here: eased, the stroke reads as already drawn by the time
+      // it reaches a comfortable viewing position.
+      const detailsEndBottom = getHomeDetailsEndBottom();
+      let lineProgress = 0;
+
+      if (reducedMotion) {
+        lineProgress = 1;
+      } else if (detailsEndBottom !== null) {
+        lineProgress = getDecorativeLineRevealProgressFromY(
+          detailsEndBottom,
+          viewportHeight,
+          0.9,
+          0.15,
+        );
+      }
+
+      line.style.setProperty("--line-draw", String(lineProgress));
+      line.classList.toggle("is-revealed", lineProgress >= 1);
+    }
   };
 
   const cleanupScroll = bindScrollMotion(update, reducedMotion);
 
+  const observer = new IntersectionObserver(() => update(), {
+    threshold: [0, 0.25, 0.5, 0.75, 1],
+  });
+
+  observer.observe(trigger);
+  if (line) observer.observe(line);
+
+  const details = document.querySelector(".home-details");
+  if (details) {
+    for (const section of details.querySelectorAll(".expertise, .languages, .education")) {
+      observer.observe(section);
+    }
+  }
+
+  const layoutRafId = requestAnimationFrame(() => {
+    requestAnimationFrame(update);
+  });
+
   return () => {
+    cancelAnimationFrame(layoutRafId);
     cleanupScroll();
-    frame.style.removeProperty("--frame-progress");
-    frame.classList.remove("is-revealed");
+    observer.disconnect();
+
+    if (frame) {
+      frame.style.removeProperty("--frame-progress");
+      frame.classList.remove("is-revealed");
+    }
+
+    if (line) {
+      line.style.removeProperty("--line-draw");
+      line.classList.remove("is-revealed");
+    }
   };
 }
 

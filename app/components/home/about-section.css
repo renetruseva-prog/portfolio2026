@@ -183,6 +183,7 @@
   height: auto;
   flex-shrink: 0;
   filter: brightness(0);
+  transform: rotate(234deg);
 }
 
 .about__quote {

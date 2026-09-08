@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -5,10 +6,26 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+
+function HashScroll() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const id = decodeURIComponent(location.hash.slice(1));
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView();
+    });
+  }, [location.pathname, location.hash, location.key]);
+
+  return null;
+}
 
 export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: "/fonts/baik.css" },
@@ -54,7 +71,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <>
+      <HashScroll />
+      <Outlet />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
