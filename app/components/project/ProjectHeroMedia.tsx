@@ -1,14 +1,21 @@
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import type { ProjectImage } from "~/content/projects";
 
+import { ProjectImageLightbox } from "./ProjectExpandableImage";
+
 const projectAssets = {
   arrowExternal: "/images/portfolio/project-link-arrow.svg",
+  zoomIcon: "/images/portfolio/project-screenshot-zoom.svg",
 } as const;
 
 type ProjectHeroMediaProps = {
   hero: ProjectImage;
 };
+
+function isDesktopViewport() {
+  return window.matchMedia("(min-width: 64rem)").matches;
+}
 
 function HeroLinkButton({ href, label }: { href: string; label: string }) {
   return (
@@ -34,6 +41,8 @@ function HeroLinkButton({ href, label }: { href: string; label: string }) {
 export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const titleId = useId();
 
   if (!hero.video) {
     return (
@@ -49,6 +58,18 @@ export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
         ) : null}
       </figure>
     );
+  }
+
+  function openLightbox() {
+    videoRef.current?.pause();
+    setIsPlaying(false);
+    setIsLightboxOpen(true);
+  }
+
+  function closeLightbox() {
+    setIsLightboxOpen(false);
+    videoRef.current?.pause();
+    setIsPlaying(false);
   }
 
   async function togglePlayback() {
@@ -69,6 +90,17 @@ export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
     setIsPlaying(false);
   }
 
+  function handleVideoPointerUp(event: React.PointerEvent<HTMLVideoElement>) {
+    if (event.pointerType !== "mouse" || !isDesktopViewport()) return;
+
+    if (isPlaying) {
+      void togglePlayback();
+      return;
+    }
+
+    openLightbox();
+  }
+
   function handleVideoPause() {
     setIsPlaying(false);
   }
@@ -78,29 +110,63 @@ export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
   }
 
   return (
-    <figure className="project-hero__media">
-      <video
-        ref={videoRef}
-        className="project-hero__video"
-        src={hero.video}
-        poster={hero.src}
-        playsInline
-        preload="metadata"
-        aria-label={hero.alt}
-        onClick={isPlaying ? togglePlayback : undefined}
-        onPlay={handleVideoPlay}
-        onPause={handleVideoPause}
-        onEnded={handleVideoPause}
-      />
-      <button
-        type="button"
-        className={`project-hero__play${isPlaying ? " project-hero__play--hidden" : ""}`}
-        aria-label={isPlaying ? "Pause project preview" : "Play project preview"}
-        aria-pressed={isPlaying}
-        onClick={togglePlayback}
-      >
-        <span className="project-hero__play-icon" aria-hidden="true" />
-      </button>
-    </figure>
+    <>
+      <figure className="project-hero__media project-hero__media--video">
+        <video
+          ref={videoRef}
+          className="project-hero__video"
+          src={hero.video}
+          poster={hero.src}
+          playsInline
+          preload="metadata"
+          aria-label={hero.alt}
+          onPointerUp={handleVideoPointerUp}
+          onPlay={handleVideoPlay}
+          onPause={handleVideoPause}
+          onEnded={handleVideoPause}
+        />
+        <button
+          type="button"
+          className={`project-hero__play${isPlaying ? " project-hero__play--hidden" : ""}`}
+          aria-label={isPlaying ? "Pause project preview" : "Play project preview"}
+          aria-pressed={isPlaying}
+          onPointerUp={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            void togglePlayback();
+          }}
+        >
+          <span className="project-hero__play-icon" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className="project-hero__expand"
+          aria-label={`View larger: ${hero.alt}`}
+          onPointerUp={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            openLightbox();
+          }}
+        >
+          <img
+            className="project-gallery__zoom-icon"
+            src={projectAssets.zoomIcon}
+            alt=""
+            width={28}
+            height={28}
+            draggable={false}
+          />
+        </button>
+      </figure>
+
+      {isLightboxOpen ? (
+        <ProjectImageLightbox
+          image={hero}
+          video={hero.video}
+          onClose={closeLightbox}
+          titleId={titleId}
+        />
+      ) : null}
+    </>
   );
 }

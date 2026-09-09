@@ -164,16 +164,27 @@ export function ExpandableImageTrigger({
 
 export function ProjectImageLightbox({
   image,
+  video,
   onClose,
   titleId,
 }: {
   image: ProjectImage;
+  video?: string;
   onClose: () => void;
   titleId: string;
 }) {
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // html owns the scrollbar (global.css), so the lock belongs there. Backfill
+    // its width so hiding it neither shifts the page nor offsets the centred overlay.
+    const root = document.documentElement;
+    const scrollbarWidth = window.innerWidth - root.clientWidth;
+    const previousOverflow = root.style.overflow;
+    const previousPaddingRight = root.style.paddingRight;
+
+    root.style.overflow = "hidden";
+    if (scrollbarWidth > 0) {
+      root.style.paddingRight = `${scrollbarWidth}px`;
+    }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -184,7 +195,8 @@ export function ProjectImageLightbox({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      root.style.overflow = previousOverflow;
+      root.style.paddingRight = previousPaddingRight;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
@@ -206,27 +218,41 @@ export function ProjectImageLightbox({
         <p id={titleId} className="sr-only">
           {image.alt}
         </p>
-        <button
-          type="button"
-          className="project-lightbox__close"
-          onClick={onClose}
-          aria-label="Close image preview"
-        >
-          <img
-            className="project-lightbox__close-icon"
-            src={closeIcon}
-            alt=""
-            width={28}
-            height={28}
-            draggable={false}
-          />
-        </button>
-        <img
-          className="project-lightbox__image"
-          src={image.src}
-          alt={image.alt}
-          draggable={false}
-        />
+        <div className="project-lightbox__media">
+          {video ? (
+            <video
+              className="project-lightbox__image project-lightbox__video"
+              src={video}
+              poster={image.src}
+              autoPlay
+              controls
+              playsInline
+              aria-label={image.alt}
+            />
+          ) : (
+            <img
+              className="project-lightbox__image"
+              src={image.src}
+              alt={image.alt}
+              draggable={false}
+            />
+          )}
+          <button
+            type="button"
+            className="project-lightbox__close"
+            onClick={onClose}
+            aria-label="Close image preview"
+          >
+            <img
+              className="project-lightbox__close-icon"
+              src={closeIcon}
+              alt=""
+              width={28}
+              height={28}
+              draggable={false}
+            />
+          </button>
+        </div>
       </figure>
     </div>
   );

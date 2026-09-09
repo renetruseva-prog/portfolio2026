@@ -200,6 +200,7 @@ function CaseStudyPage({
         <article
           ref={articleRef}
           className="project-page__article"
+          data-project={project.slug}
           aria-labelledby={titleId}
         >
           <div className="project-page__inner">
@@ -224,235 +225,261 @@ function CaseStudyPage({
             </header>
 
             <section
-              className="project-section"
+              className="project-section project-section--summary"
               aria-labelledby="project-summary-heading"
             >
-              <h2
-                id="project-summary-heading"
-                className="project-section__title display-title"
-              >
-                Summary
-              </h2>
-              <p className="project-section__body">{caseStudy.summary}</p>
+              <div className="project-section__summary-grid">
+                <div className="project-section__summary-copy">
+                  <h2
+                    id="project-summary-heading"
+                    className="project-section__title display-title"
+                  >
+                    Summary
+                  </h2>
+                  <p className="project-section__body">{caseStudy.summary}</p>
+                </div>
 
-              <ProjectLinkActions links={caseStudy.links} />
+                <ProjectLinkActions links={caseStudy.links} />
+              </div>
 
               <hr className="project-divider" />
             </section>
 
-            <section
-              className="project-section project-section--field"
-              aria-labelledby="project-field-heading"
-            >
-              <h2
-                id="project-field-heading"
-                className="project-section__title display-title"
-              >
-                Field
-              </h2>
-              <div className="project-section__tags-wrap">
-                <TagList items={project.tags} underlineFirst />
-              </div>
-            </section>
-
-            <section
-              className="project-section"
-              aria-labelledby="project-toolkit-heading"
-            >
-              <h2
-                id="project-toolkit-heading"
-                className="project-section__title display-title"
-              >
-                Toolkit
-              </h2>
-
-              <div className="project-toolkit">
-                {caseStudy.toolkit.map((group) => (
-                  <div key={group.label} className="project-toolkit__group">
-                    <h3 className="project-toolkit__label display-title">
-                      {group.label}
-                    </h3>
-                    <TagList items={group.items} />
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {caseStudy.processIntro ? (
-              <section
-                className="project-section project-section--process-intro"
-                aria-labelledby="project-process-intro-heading"
-              >
-                <h2
-                  id="project-process-intro-heading"
-                  className="project-section__title display-title"
+            <div className="project-page__panel project-page__panel--details">
+              <div className="project-page__panel-main">
+                <section
+                  className="project-section project-section--field"
+                  aria-labelledby="project-field-heading"
                 >
-                  Process
-                </h2>
-                <div className="project-section__copy">
-                  {caseStudy.processIntro.paragraphs.map((paragraph) => (
-                    <p key={paragraph} className="project-section__body">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-                {caseStudy.processIntro.link ? (
-                  <ProjectLinkButton
-                    href={caseStudy.processIntro.link.href}
-                    label={caseStudy.processIntro.link.label}
-                    variant="cream"
-                  />
-                ) : null}
-              </section>
-            ) : null}
+                  <h2
+                    id="project-field-heading"
+                    className="project-section__title display-title"
+                  >
+                    Field
+                  </h2>
+                  <div className="project-section__tags-wrap">
+                    <TagList items={project.tags} underlineFirst />
+                  </div>
+                </section>
 
-            <section
-              className="project-section"
-              aria-labelledby="project-screenshots-heading"
-            >
-              <h2
-                id="project-screenshots-heading"
-                className="project-section__title display-title"
-              >
-                Screenshots
-              </h2>
-              <ProjectScreenshotGallery rows={caseStudy.screenshotRows} />
-            </section>
+                <section
+                  className="project-section"
+                  aria-labelledby="project-toolkit-heading"
+                >
+                  <h2
+                    id="project-toolkit-heading"
+                    className="project-section__title display-title"
+                  >
+                    Toolkit
+                  </h2>
+
+                  <div className="project-toolkit">
+                    {caseStudy.toolkit.map((group) => (
+                      <div key={group.label} className="project-toolkit__group">
+                        <h3 className="project-toolkit__label display-title">
+                          {group.label}
+                        </h3>
+                        <TagList items={group.items} />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {caseStudy.processIntro ? (
+                  <section
+                    className="project-section project-section--process-intro"
+                    aria-labelledby="project-process-intro-heading"
+                  >
+                    <h2
+                      id="project-process-intro-heading"
+                      className="project-section__title display-title"
+                    >
+                      Process
+                    </h2>
+                    <div className="project-section__copy">
+                      {caseStudy.processIntro.paragraphs.map((paragraph) => (
+                        <p key={paragraph} className="project-section__body">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                    {caseStudy.processIntro.link ? (
+                      <ProjectLinkButton
+                        href={caseStudy.processIntro.link.href}
+                        label={caseStudy.processIntro.link.label}
+                        variant="cream"
+                      />
+                    ) : null}
+                  </section>
+                ) : null}
+              </div>
+
+              <div className="project-page__panel-aside">
+                <section
+                  className="project-section"
+                  aria-labelledby="project-screenshots-heading"
+                >
+                  <h2
+                    id="project-screenshots-heading"
+                    className="project-section__title display-title"
+                  >
+                    Screenshots
+                  </h2>
+                  <ProjectScreenshotGallery rows={caseStudy.screenshotRows} />
+                </section>
+              </div>
+            </div>
 
             <hr className="project-divider project-divider--standalone" />
 
-            {caseStudy.descriptionSection ? (
-              <section
-                className="project-section"
-                aria-labelledby="project-description-section-heading"
-              >
-                <h2
-                  id="project-description-section-heading"
-                  className="project-section__title display-title"
-                >
-                  {caseStudy.descriptionSection.title}
-                </h2>
-                <div className="project-section__copy">
-                  {caseStudy.descriptionSection.paragraphs.map((paragraph) => (
-                    <p key={paragraph} className="project-section__body">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-                {caseStudy.descriptionSection.links ? (
-                  <ProjectLinkActions links={caseStudy.descriptionSection.links} />
+            <div
+              className={`project-page__panel project-page__panel--outcomes${
+                caseStudy.process ? "" : " project-page__panel--single"
+              }`}
+            >
+              <div className="project-page__panel-main">
+                {caseStudy.descriptionSection ? (
+                  <section
+                    className="project-section"
+                    aria-labelledby="project-description-section-heading"
+                  >
+                    <h2
+                      id="project-description-section-heading"
+                      className="project-section__title display-title"
+                    >
+                      {caseStudy.descriptionSection.title}
+                    </h2>
+                    <div className="project-section__copy">
+                      {caseStudy.descriptionSection.paragraphs.map(
+                        (paragraph) => (
+                          <p key={paragraph} className="project-section__body">
+                            {paragraph}
+                          </p>
+                        ),
+                      )}
+                    </div>
+                    {caseStudy.descriptionSection.links ? (
+                      <ProjectLinkActions
+                        links={caseStudy.descriptionSection.links}
+                      />
+                    ) : null}
+                    {caseStudy.descriptionSection.screenshotRows ? (
+                      <ProjectScreenshotGallery
+                        rows={caseStudy.descriptionSection.screenshotRows}
+                      />
+                    ) : null}
+                  </section>
                 ) : null}
-                {caseStudy.descriptionSection.screenshotRows ? (
-                  <ProjectScreenshotGallery
-                    rows={caseStudy.descriptionSection.screenshotRows}
-                  />
+
+                {caseStudy.description ? (
+                  <section
+                    className="project-section"
+                    aria-labelledby="project-description-heading"
+                  >
+                    <h2
+                      id="project-description-heading"
+                      className="project-section__title display-title"
+                    >
+                      Description
+                    </h2>
+                    <div className="project-section__copy">
+                      {caseStudy.description.map((paragraph) => (
+                        <p key={paragraph} className="project-section__body">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  </section>
                 ) : null}
-              </section>
-            ) : null}
 
-            {caseStudy.description ? (
-              <section
-                className="project-section"
-                aria-labelledby="project-description-heading"
-              >
-                <h2
-                  id="project-description-heading"
-                  className="project-section__title display-title"
-                >
-                  Description
-                </h2>
-                <div className="project-section__copy">
-                  {caseStudy.description.map((paragraph) => (
-                    <p key={paragraph} className="project-section__body">
-                      {paragraph}
+                {caseStudy.role ? (
+                  <section
+                    className="project-section"
+                    aria-labelledby="project-role-heading"
+                  >
+                    <h2
+                      id="project-role-heading"
+                      className="project-section__title display-title"
+                    >
+                      My role
+                    </h2>
+                    <ul className="project-goals">
+                      {caseStudy.role.map((item) => (
+                        <li key={item} className="project-goals__item">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ) : null}
+
+                {caseStudy.goals ? (
+                  <section
+                    className="project-section"
+                    aria-labelledby="project-goal-heading"
+                  >
+                    <h2
+                      id="project-goal-heading"
+                      className="project-section__title display-title"
+                    >
+                      Goal
+                    </h2>
+                    <ul className="project-goals">
+                      {caseStudy.goals.map((goal) => (
+                        <li key={goal} className="project-goals__item">
+                          {goal}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ) : null}
+
+                {caseStudy.features ? (
+                  <section
+                    className="project-section"
+                    aria-labelledby="project-features-heading"
+                  >
+                    <h2
+                      id="project-features-heading"
+                      className="project-section__title display-title"
+                    >
+                      Features
+                    </h2>
+                    <ul className="project-goals">
+                      {caseStudy.features.map((feature) => (
+                        <li key={feature} className="project-goals__item">
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ) : null}
+              </div>
+
+              {caseStudy.process ? (
+                <div className="project-page__panel-aside">
+                  <section
+                    className="project-section"
+                    aria-labelledby="project-process-heading"
+                  >
+                    <h2
+                      id="project-process-heading"
+                      className="project-section__title display-title"
+                    >
+                      Process
+                    </h2>
+                    <p className="project-process__step">
+                      {caseStudy.process.step}
                     </p>
-                  ))}
+                    <ProjectExpandableImage
+                      image={caseStudy.process.image}
+                      figureClassName="project-process__figure project-gallery__figure"
+                      imageClassName="project-process__image project-gallery__image"
+                    />
+                  </section>
                 </div>
-              </section>
-            ) : null}
-
-            {caseStudy.role ? (
-              <section
-                className="project-section"
-                aria-labelledby="project-role-heading"
-              >
-                <h2
-                  id="project-role-heading"
-                  className="project-section__title display-title"
-                >
-                  My role
-                </h2>
-                <ul className="project-goals">
-                  {caseStudy.role.map((item) => (
-                    <li key={item} className="project-goals__item">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            {caseStudy.goals ? (
-              <section
-                className="project-section"
-                aria-labelledby="project-goal-heading"
-              >
-                <h2
-                  id="project-goal-heading"
-                  className="project-section__title display-title"
-                >
-                  Goal
-                </h2>
-                <ul className="project-goals">
-                  {caseStudy.goals.map((goal) => (
-                    <li key={goal} className="project-goals__item">
-                      {goal}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            {caseStudy.features ? (
-              <section
-                className="project-section"
-                aria-labelledby="project-features-heading"
-              >
-                <h2
-                  id="project-features-heading"
-                  className="project-section__title display-title"
-                >
-                  Features
-                </h2>
-                <ul className="project-goals">
-                  {caseStudy.features.map((feature) => (
-                    <li key={feature} className="project-goals__item">
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            {caseStudy.process ? (
-              <section
-                className="project-section"
-                aria-labelledby="project-process-heading"
-              >
-                <h2
-                  id="project-process-heading"
-                  className="project-section__title display-title"
-                >
-                  Process
-                </h2>
-                <p className="project-process__step">{caseStudy.process.step}</p>
-                <ProjectExpandableImage
-                  image={caseStudy.process.image}
-                  figureClassName="project-process__figure project-gallery__figure"
-                  imageClassName="project-process__image project-gallery__image"
-                />
-              </section>
-            ) : null}
+              ) : null}
+            </div>
 
             {prevProject || nextProject ? (
               <nav

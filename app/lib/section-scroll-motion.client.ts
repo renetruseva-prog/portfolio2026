@@ -36,6 +36,18 @@ function getHomeDetailsEndBottom() {
   return Number.isFinite(maxBottom) ? maxBottom : null;
 }
 
+function getFooterLineAnchorBottom() {
+  const detailsEnd = getHomeDetailsEndBottom();
+  if (detailsEnd !== null) return detailsEnd;
+
+  const projectInner = document.querySelector<HTMLElement>(".project-page__inner");
+  if (projectInner) {
+    return projectInner.getBoundingClientRect().bottom;
+  }
+
+  return null;
+}
+
 export function getDecorativeLineRevealProgress(
   anchor: HTMLElement,
   viewportHeight: number,
@@ -344,14 +356,14 @@ export function initFooterMotion(section: HTMLElement) {
       // end clears the fold — otherwise the draw finishes before the line is on screen.
       // Progress stays linear here: eased, the stroke reads as already drawn by the time
       // it reaches a comfortable viewing position.
-      const detailsEndBottom = getHomeDetailsEndBottom();
+      const anchorBottom = getFooterLineAnchorBottom();
       let lineProgress = 0;
 
       if (reducedMotion) {
         lineProgress = 1;
-      } else if (detailsEndBottom !== null) {
+      } else if (anchorBottom !== null) {
         lineProgress = getDecorativeLineRevealProgressFromY(
-          detailsEndBottom,
+          anchorBottom,
           viewportHeight,
           0.9,
           0.15,
@@ -377,6 +389,11 @@ export function initFooterMotion(section: HTMLElement) {
     for (const section of details.querySelectorAll(".expertise, .languages, .education")) {
       observer.observe(section);
     }
+  }
+
+  const projectInner = document.querySelector(".project-page__inner");
+  if (projectInner) {
+    observer.observe(projectInner);
   }
 
   const layoutRafId = requestAnimationFrame(() => {

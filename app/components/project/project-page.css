@@ -127,6 +127,18 @@
   border-left-color: rgb(52, 52, 44);
 }
 
+.project-hero__expand {
+  display: none;
+  opacity: 0;
+  cursor: zoom-in;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.project-lightbox__video {
+  cursor: default;
+}
+
 .project-section {
   display: flex;
   flex-direction: column;
@@ -135,7 +147,7 @@
 }
 
 .project-section__title {
-  margin: 0;
+  margin: 0 0 1rem 0;
   font-size: 1.875rem;
   line-height: 1.35;
   text-transform: none;
@@ -275,10 +287,6 @@
 }
 
 
-.project-page__title-accent display-title {
-   color: rgb(208, 14, 14);
-}  
-
 .project-link-btn:hover .project-link-btn__icon {
   transform: translateX(0.5rem) rotate(36deg);
 }
@@ -362,9 +370,17 @@
 }
 
 .project-gallery__figure {
+  position: relative;
+  z-index: 0;
   margin: 0;
   overflow: visible;
   background-color: rgba(255, 255, 255, 0.04);
+}
+
+.project-gallery__figure:has(.project-gallery__trigger:hover),
+.project-gallery__figure:has(.project-gallery__trigger.is-revealed),
+.project-gallery__figure:has(.project-gallery__trigger:focus-visible) {
+  z-index: 1;
 }
 
 .project-gallery__trigger {
@@ -377,6 +393,7 @@
   cursor: zoom-in;
   text-align: left;
   touch-action: manipulation;
+  overflow: visible;
 }
 
 .project-gallery__trigger:focus-visible {
@@ -384,18 +401,28 @@
   outline-offset: 2px;
 }
 
-.project-gallery__zoom {
+.project-gallery__zoom,
+.project-lightbox__close,
+.project-hero__expand {
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 1;
   display: block;
-  opacity: 0;
+  padding: 0;
+  border: 0;
+  background: none;
   transform: translate(50%, -50%);
+}
+
+.project-gallery__zoom {
+  opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
 }
 
-.project-gallery__zoom-icon {
+.project-gallery__zoom-icon,
+.project-lightbox__close-icon {
   display: block;
   width: 1.75rem;
   height: 1.75rem;
@@ -419,13 +446,14 @@
 }
 
 .project-lightbox {
+  --lightbox-max-width: 90vw;
+  --lightbox-max-height: calc(100vh - 2rem);
   position: fixed;
   inset: 0;
   z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
 }
 
 .project-lightbox__backdrop {
@@ -435,28 +463,53 @@
   border: 0;
   background: rgba(0, 0, 0, 0.78);
   cursor: pointer;
+  animation: project-lightbox-backdrop-in 0.35s ease-out both;
 }
 
 .project-lightbox__figure {
   position: relative;
   z-index: 1;
-  width: 90%;
-  max-height: calc(100vh - 2rem);
   margin: 0;
   overflow: visible;
+  line-height: 0;
+}
+
+/* Shrink-wraps the image exactly so the close badge lands on the photo corner.
+   Constraints stay in viewport units: a percentage here would be circular. */
+.project-lightbox__media {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  line-height: 0;
+  animation: project-lightbox-media-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes project-lightbox-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes project-lightbox-media-in {
+  from {
+    opacity: 0;
+    transform: translateY(12vh);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .project-lightbox__close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 2;
-  display: block;
-  padding: 0;
-  border: 0;
-  background: none;
   cursor: pointer;
-  transform: translate(50%, -50%);
+  z-index: 2;
 }
 
 .project-lightbox__close:focus-visible {
@@ -464,18 +517,12 @@
   outline-offset: 2px;
 }
 
-.project-lightbox__close-icon {
-  display: block;
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
 .project-lightbox__image {
   display: block;
-  width: 100%;
+  width: auto;
   height: auto;
-  max-height: calc(100vh - 2rem);
-  margin-inline: auto;
+  max-width: var(--lightbox-max-width);
+  max-height: var(--lightbox-max-height);
   object-fit: contain;
   box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.45);
 }
@@ -704,12 +751,31 @@
   opacity: 0.75;
 }
 
+.project-section__summary-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.project-page__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.project-page__panel-main,
+.project-page__panel-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  min-width: 0;
+}
+
 @media (min-width: 30rem) {
   .project-page__inner {
     gap: 3.5rem;
-    max-width: 72rem;
-    margin: 0 auto;
-    padding: 0 6.25rem 5rem;
+    padding: 0 0 5rem;
+    margin-top: clamp(2rem, 14vw, 4rem);
   }
 
   .project-page__title {
@@ -763,6 +829,227 @@
   }
 }
 
+@media (min-width: 64rem) {
+  .project-page__inner {
+    padding-bottom: 6rem;
+  }
+
+  .project-adjacent {
+    margin-bottom: 0;
+  }
+
+  .project-page__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) min(23.625rem, 36%);
+    gap: 2rem 3rem;
+    align-items: start;
+  }
+
+  .project-page__title {
+    max-width: none;
+  }
+
+  .project-page__title-lead,
+  .project-page__title-accent {
+    font-size: clamp(3.5rem, 5.625vw, 5.625rem);
+    line-height: 1.35;
+  }
+
+  .project-hero__media {
+    justify-self: end;
+    width: 100%;
+    max-width: 23.625rem;
+  }
+
+  .project-hero__media--video {
+    overflow: visible;
+  }
+
+  .project-hero__media--video .project-hero__video {
+    cursor: zoom-in;
+  }
+
+  .project-hero__expand {
+    display: block;
+    z-index: 2;
+  }
+
+  .project-hero__media--video:hover .project-hero__expand,
+  .project-hero__expand:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .project-section--summary .project-section__summary-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 32.5rem) minmax(0, 1fr);
+    gap: 2rem clamp(2rem, 8vw, 6rem);
+    align-items: start;
+  }
+
+  .project-section--summary .project-section__body {
+    margin-bottom: 0;
+  }
+
+  .project-section--summary .project-section__actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    justify-self: end;
+    gap: 1.25rem;
+    margin-top: 0.125rem;
+  }
+
+  .project-page__panel:not(.project-page__panel--single) {
+    display: grid;
+    grid-template-columns: 17.75rem minmax(0, 1fr);
+    gap: 2.5rem clamp(3rem, 11vw, 11.4375rem);
+    align-items: start;
+  }
+
+  .project-page__panel-main {
+    gap: 3.8125rem;
+  }
+
+  .project-page__panel-aside .project-gallery {
+    margin-top: 0.875rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 158fr) minmax(0, 178fr) minmax(0, 197fr) minmax(0, 139fr);
+    column-gap: 2.8125rem;
+    row-gap: 1.9375rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery__row {
+    display: contents;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery__figure {
+    overflow: visible;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(1)
+    .project-gallery__figure:nth-child(1) {
+    grid-area: 1 / 1;
+    height: 8.625rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(1)
+    .project-gallery__figure:nth-child(2) {
+    grid-area: 1 / 2;
+    height: 8.625rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(2)
+    .project-gallery__figure:nth-child(1) {
+    grid-area: 1 / 3 / 2 / 5;
+    height: 8.625rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(3)
+    .project-gallery__figure:nth-child(1) {
+    grid-area: 2 / 1;
+    height: 8.375rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(4)
+    .project-gallery__figure:nth-child(1) {
+    grid-area: 2 / 2 / 3 / 4;
+    height: 8.375rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(4)
+    .project-gallery__figure:nth-child(2) {
+    grid-area: 2 / 4;
+    height: 8.375rem;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery__figure
+    .project-gallery__trigger,
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery__figure
+    .project-gallery__image {
+    width: 100%;
+    height: 100%;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery__figure
+    .project-gallery__image {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(3)
+    .project-gallery__image,
+  .project-page__article[data-project="project1"]
+    .project-page__panel-aside
+    .project-gallery
+    > .project-gallery__row:nth-child(4)
+    .project-gallery__image {
+    object-position: center bottom;
+  }
+
+  .project-page__panel--outcomes .project-process__figure {
+    width: min(100%, 23.6875rem);
+    max-width: none;
+    margin-top: 0;
+  }
+
+  .project-page__panel--outcomes .project-process__image {
+    height: auto;
+  }
+
+  .project-page__panel--outcomes
+    .project-page__panel-aside
+    .project-section:has(.project-process__figure) {
+    gap: 1.5625rem;
+  }
+
+  .project-page__panel--outcomes .project-process__step {
+    margin-top: 0.3125rem;
+  }
+
+  .project-lightbox {
+    --lightbox-max-width: 81vw;
+    --lightbox-max-height: calc(90vh - 1.8rem);
+  }
+}
+
 @media (max-width: 29.99rem) {
   .project-link-btn {
     min-height: var(--btn-height-mobile);
@@ -774,5 +1061,10 @@
   .project-tags__squiggle {
     --draw-progress: 1;
     clip-path: none;
+  }
+
+  .project-lightbox__backdrop,
+  .project-lightbox__media {
+    animation: none;
   }
 }
