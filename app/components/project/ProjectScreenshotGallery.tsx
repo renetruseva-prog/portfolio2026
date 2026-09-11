@@ -19,6 +19,13 @@ function useTripleRowLastImageHeight(
     const row = rowRef.current;
     if (!row) return;
 
+    if (
+      row.closest('[data-project="project2"]') &&
+      window.matchMedia("(min-width: 64rem)").matches
+    ) {
+      return;
+    }
+
     const syncHeights = () => {
       const images = Array.from(
         row.querySelectorAll<HTMLImageElement>(".project-gallery__image"),
