@@ -20,7 +20,7 @@ function useTripleRowLastImageHeight(
     if (!row) return;
 
     if (
-      row.closest('[data-project="project2"]') &&
+      row.closest(".project-page__panel-aside .project-gallery") &&
       window.matchMedia("(min-width: 64rem)").matches
     ) {
       return;
