@@ -279,7 +279,8 @@ function CaseStudyPage({
                         <h3 className="project-toolkit__label display-title">
                           {group.label}
                         </h3>
-                        {project.slug === "project2" && group.label === "Code" ? (
+                        {(project.slug === "project2" || project.slug === "project3") &&
+                        group.label === "Code" ? (
                           <div className="project-tags-rows">
                             <TagList items={group.items.slice(0, 4)} />
                             <TagList items={group.items.slice(4)} />
