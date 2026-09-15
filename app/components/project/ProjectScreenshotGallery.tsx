@@ -9,6 +9,7 @@ import {
 
 type ProjectScreenshotGalleryProps = {
   rows: readonly ProjectScreenshotRow[];
+  roundFirstImage?: boolean;
 };
 
 function useTripleRowLastImageHeight(
@@ -95,11 +96,13 @@ function TripleScreenshotRow({
   revealedSrc,
   onReveal,
   onOpen,
+  roundFirstImage,
 }: {
   row: Extract<ProjectScreenshotRow, { type: "triple" }>;
   revealedSrc: string | null;
   onReveal: (src: string) => void;
-  onOpen: (image: ProjectImage) => void;
+  onOpen: (image: ProjectImage, imageClassName: string) => void;
+  roundFirstImage?: boolean;
 }) {
   const rowRef = useRef<HTMLLIElement>(null);
   const imageSources = row.images.map((image) => image.src);
@@ -111,20 +114,25 @@ function TripleScreenshotRow({
       ref={rowRef}
       className="project-gallery__row project-gallery__row--triple"
     >
-      {row.images.map((image, index) => (
-        <ExpandableImageTrigger
-          key={image.src}
-          image={image}
-          isRevealed={revealedSrc === image.src}
-          onReveal={() => onReveal(image.src)}
-          onOpen={() => onOpen(image)}
-          imageClassName={
-            index === 2
-              ? "project-gallery__image project-gallery__image--triple-last"
-              : "project-gallery__image"
-          }
-        />
-      ))}
+      {row.images.map((image, index) => {
+        const imageClassName =
+          index === 2
+            ? "project-gallery__image project-gallery__image--triple-last"
+            : index === 0 && roundFirstImage
+              ? "project-gallery__image project-gallery__image--rounded"
+              : "project-gallery__image";
+
+        return (
+          <ExpandableImageTrigger
+            key={image.src}
+            image={image}
+            isRevealed={revealedSrc === image.src}
+            onReveal={() => onReveal(image.src)}
+            onOpen={() => onOpen(image, imageClassName)}
+            imageClassName={imageClassName}
+          />
+        );
+      })}
     </li>
   );
 }
@@ -134,20 +142,25 @@ function ScreenshotRow({
   revealedSrc,
   onReveal,
   onOpen,
+  roundFirstImage,
 }: {
   row: ProjectScreenshotRow;
   revealedSrc: string | null;
   onReveal: (src: string) => void;
-  onOpen: (image: ProjectImage) => void;
+  onOpen: (image: ProjectImage, imageClassName: string) => void;
+  roundFirstImage?: boolean;
 }) {
   if (row.type === "full") {
+    const imageClassName = "project-gallery__image";
+
     return (
       <li className="project-gallery__row project-gallery__row--full">
         <ExpandableImageTrigger
           image={row.image}
           isRevealed={revealedSrc === row.image.src}
           onReveal={() => onReveal(row.image.src)}
-          onOpen={() => onOpen(row.image)}
+          onOpen={() => onOpen(row.image, imageClassName)}
+          imageClassName={imageClassName}
         />
       </li>
     );
@@ -160,6 +173,7 @@ function ScreenshotRow({
         revealedSrc={revealedSrc}
         onReveal={onReveal}
         onOpen={onOpen}
+        roundFirstImage={roundFirstImage}
       />
     );
   }
@@ -167,36 +181,52 @@ function ScreenshotRow({
   if (row.type === "pair-wide-left") {
     return (
       <li className="project-gallery__row project-gallery__row--pair-wide-left">
-        {row.images.map((image) => (
-          <ExpandableImageTrigger
-            key={image.src}
-            image={image}
-            isRevealed={revealedSrc === image.src}
-            onReveal={() => onReveal(image.src)}
-            onOpen={() => onOpen(image)}
-          />
-        ))}
+        {row.images.map((image) => {
+          const imageClassName = "project-gallery__image";
+
+          return (
+            <ExpandableImageTrigger
+              key={image.src}
+              image={image}
+              isRevealed={revealedSrc === image.src}
+              onReveal={() => onReveal(image.src)}
+              onOpen={() => onOpen(image, imageClassName)}
+              imageClassName={imageClassName}
+            />
+          );
+        })}
       </li>
     );
   }
 
   return (
     <li className="project-gallery__row project-gallery__row--pair">
-      {row.images.map((image) => (
-        <ExpandableImageTrigger
-          key={image.src}
-          image={image}
-          isRevealed={revealedSrc === image.src}
-          onReveal={() => onReveal(image.src)}
-          onOpen={() => onOpen(image)}
-        />
-      ))}
+      {row.images.map((image) => {
+        const imageClassName = "project-gallery__image";
+
+        return (
+          <ExpandableImageTrigger
+            key={image.src}
+            image={image}
+            isRevealed={revealedSrc === image.src}
+            onReveal={() => onReveal(image.src)}
+            onOpen={() => onOpen(image, imageClassName)}
+            imageClassName={imageClassName}
+          />
+        );
+      })}
     </li>
   );
 }
 
-export function ProjectScreenshotGallery({ rows }: ProjectScreenshotGalleryProps) {
+export function ProjectScreenshotGallery({
+  rows,
+  roundFirstImage = false,
+}: ProjectScreenshotGalleryProps) {
   const [activeImage, setActiveImage] = useState<ProjectImage | null>(null);
+  const [activeImageClassName, setActiveImageClassName] = useState(
+    "project-gallery__image",
+  );
   const [revealedSrc, setRevealedSrc] = useState<string | null>(null);
   const galleryRef = useRef<HTMLUListElement>(null);
   const titleId = useId();
@@ -217,8 +247,9 @@ export function ProjectScreenshotGallery({ rows }: ProjectScreenshotGalleryProps
     };
   }, [revealedSrc]);
 
-  function handleOpen(image: ProjectImage) {
+  function handleOpen(image: ProjectImage, imageClassName: string) {
     setRevealedSrc(null);
+    setActiveImageClassName(imageClassName);
     setActiveImage(image);
   }
 
@@ -232,6 +263,7 @@ export function ProjectScreenshotGallery({ rows }: ProjectScreenshotGalleryProps
             revealedSrc={revealedSrc}
             onReveal={setRevealedSrc}
             onOpen={handleOpen}
+            roundFirstImage={roundFirstImage}
           />
         ))}
       </ul>
@@ -239,6 +271,7 @@ export function ProjectScreenshotGallery({ rows }: ProjectScreenshotGalleryProps
       {activeImage ? (
         <ProjectImageLightbox
           image={activeImage}
+          imageClassName={activeImageClassName}
           onClose={() => setActiveImage(null)}
           titleId={titleId}
         />

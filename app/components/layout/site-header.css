@@ -14,6 +14,7 @@
   overscroll-behavior: none;
   background-color: var(--color-bg);
   padding-bottom: 2rem;
+  animation: site-header-menu-open 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .site-header__bar {
@@ -112,8 +113,24 @@
   transform: translateY(-50%) rotate(-42deg) scaleX(1.05);
 }
 
+@keyframes site-header-menu-open {
+  from {
+    opacity: 0.92;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .site-header__menu-line {
+  .site-header--menu-open {
+    animation: none;
+  }
+
+  .site-header__menu-line,
+  .site-header__menu-panel,
+  .site-header__menu-item {
     transition: none;
   }
 }
@@ -165,11 +182,28 @@
 
 .site-header__menu-panel {
   flex: 1;
-  padding: 2rem var(--space-4) 0;
+  height: 0;
+  overflow: hidden;
+  padding: 0 var(--space-4);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-0.75rem);
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0.45s,
+    padding 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.site-header__menu-panel[hidden] {
-  display: none;
+.site-header--menu-open .site-header__menu-panel {
+  height: auto;
+  overflow: visible;
+  padding: 2rem var(--space-4) 0;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .site-header__menu-list {
@@ -186,6 +220,32 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.site-header--menu-open .site-header__menu-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-header--menu-open .site-header__menu-item:nth-child(1) {
+  transition-delay: 0.08s;
+}
+
+.site-header--menu-open .site-header__menu-item:nth-child(2) {
+  transition-delay: 0.14s;
+}
+
+.site-header--menu-open .site-header__menu-item:nth-child(3) {
+  transition-delay: 0.2s;
+}
+
+.site-header--menu-open .site-header__menu-item:nth-child(4) {
+  transition-delay: 0.26s;
 }
 
 .site-header__menu-link {
