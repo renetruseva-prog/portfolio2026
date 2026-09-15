@@ -342,7 +342,11 @@ function CaseStudyPage({
 
             <div
               className={`project-page__panel project-page__panel--outcomes${
-                caseStudy.process ? "" : " project-page__panel--single"
+                caseStudy.process ||
+                (project.slug === "project4" &&
+                  caseStudy.descriptionSection?.screenshotRows)
+                  ? ""
+                  : " project-page__panel--single"
               }`}
             >
               <div className="project-page__panel-main">
@@ -371,7 +375,8 @@ function CaseStudyPage({
                         links={caseStudy.descriptionSection.links}
                       />
                     ) : null}
-                    {caseStudy.descriptionSection.screenshotRows ? (
+                    {caseStudy.descriptionSection.screenshotRows &&
+                    project.slug !== "project4" ? (
                       <ProjectScreenshotGallery
                         rows={caseStudy.descriptionSection.screenshotRows}
                       />
@@ -485,6 +490,16 @@ function CaseStudyPage({
                       imageClassName="project-process__image project-gallery__image"
                     />
                   </section>
+                </div>
+              ) : null}
+
+              {project.slug === "project4" &&
+              caseStudy.descriptionSection?.screenshotRows ? (
+                <div className="project-page__panel-aside">
+                  <ProjectScreenshotGallery
+                    rows={caseStudy.descriptionSection.screenshotRows}
+                    roundFirstImage
+                  />
                 </div>
               ) : null}
             </div>

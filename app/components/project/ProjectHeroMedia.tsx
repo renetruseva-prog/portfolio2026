@@ -44,22 +44,6 @@ export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const titleId = useId();
 
-  if (!hero.video) {
-    return (
-      <figure className="project-hero__media">
-        <img
-          className="project-hero__image"
-          src={hero.src}
-          alt={hero.alt}
-          draggable={false}
-        />
-        {hero.link ? (
-          <HeroLinkButton href={hero.link.href} label={hero.link.label} />
-        ) : null}
-      </figure>
-    );
-  }
-
   function openLightbox() {
     videoRef.current?.pause();
     setIsPlaying(false);
@@ -70,6 +54,57 @@ export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
     setIsLightboxOpen(false);
     videoRef.current?.pause();
     setIsPlaying(false);
+  }
+
+  if (!hero.video) {
+    function handleImagePointerUp(event: React.PointerEvent<HTMLImageElement>) {
+      if (event.pointerType !== "mouse" || !isDesktopViewport()) return;
+      openLightbox();
+    }
+
+    return (
+      <>
+        <figure className="project-hero__media project-hero__media--expandable">
+          <img
+            className="project-hero__image"
+            src={hero.src}
+            alt={hero.alt}
+            draggable={false}
+            onPointerUp={handleImagePointerUp}
+          />
+          <button
+            type="button"
+            className="project-hero__expand"
+            aria-label={`View larger: ${hero.alt}`}
+            onPointerUp={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              openLightbox();
+            }}
+          >
+            <img
+              className="project-gallery__zoom-icon"
+              src={projectAssets.zoomIcon}
+              alt=""
+              width={28}
+              height={28}
+              draggable={false}
+            />
+          </button>
+          {hero.link ? (
+            <HeroLinkButton href={hero.link.href} label={hero.link.label} />
+          ) : null}
+        </figure>
+
+        {isLightboxOpen ? (
+          <ProjectImageLightbox
+            image={hero}
+            onClose={closeLightbox}
+            titleId={titleId}
+          />
+        ) : null}
+      </>
+    );
   }
 
   async function togglePlayback() {

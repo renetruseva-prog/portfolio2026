@@ -99,6 +99,7 @@ export function ProjectExpandableImage({
       {isOpen ? (
         <ProjectImageLightbox
           image={image}
+          imageClassName={imageClassName}
           onClose={handleClose}
           titleId={titleId}
         />
@@ -165,14 +166,21 @@ export function ExpandableImageTrigger({
 export function ProjectImageLightbox({
   image,
   video,
+  imageClassName = "project-gallery__image",
   onClose,
   titleId,
 }: {
   image: ProjectImage;
   video?: string;
+  imageClassName?: string;
   onClose: () => void;
   titleId: string;
 }) {
+  const lightboxImageClassName = imageClassName.includes(
+    "project-gallery__image--rounded",
+  )
+    ? "project-lightbox__image project-gallery__image--rounded"
+    : "project-lightbox__image";
   useEffect(() => {
     // html owns the scrollbar (global.css), so the lock belongs there. Backfill
     // its width so hiding it neither shifts the page nor offsets the centred overlay.
@@ -231,7 +239,7 @@ export function ProjectImageLightbox({
             />
           ) : (
             <img
-              className="project-lightbox__image"
+              className={lightboxImageClassName}
               src={image.src}
               alt={image.alt}
               draggable={false}

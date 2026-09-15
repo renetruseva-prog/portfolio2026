@@ -120,7 +120,8 @@ export function SiteHeader() {
         id={menuId}
         aria-label="Main"
         className="site-header__menu-panel"
-        hidden={!isMenuOpen}
+        aria-hidden={!isMenuOpen}
+        inert={isMenuOpen ? undefined : ""}
       >
         <ul className="site-header__menu-list">
           {site.mobileMenuLinks.map((link, index) => (
