@@ -1,14 +1,8 @@
+import { getCheckedSlideIndex, subscribeSlideChange } from "./works-slide.client";
+
 const BALLOON_SLIDE_INDEX = 0;
 const POP_MS = 850;
 const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
-
-function getCheckedSlideIndex() {
-  const checked = document.querySelector<HTMLInputElement>(
-    'input[name="works-slide"]:checked',
-  );
-  if (!checked) return 0;
-  return Number(checked.id.replace("works-slide-", ""));
-}
 
 function readBalloonMirror(balloon: HTMLElement) {
   const value = getComputedStyle(balloon).getPropertyValue("--balloon-mirror").trim();
@@ -248,10 +242,7 @@ export function initWorksBalloonIntro(section: HTMLElement, visual: HTMLElement)
     window.visualViewport?.removeEventListener("resize", scheduleTryPlayScroll);
   };
 
-  const radios = document.querySelectorAll<HTMLInputElement>('input[name="works-slide"]');
-  for (const radio of radios) {
-    radio.addEventListener("change", onSlideChange);
-  }
+  const unsubscribe = subscribeSlideChange(onSlideChange);
 
   reset();
   attachScroll();
@@ -280,8 +271,6 @@ export function initWorksBalloonIntro(section: HTMLElement, visual: HTMLElement)
     window.clearTimeout(finishTimer);
     window.clearInterval(pollTimer);
     detachScroll();
-    for (const radio of radios) {
-      radio.removeEventListener("change", onSlideChange);
-    }
+    unsubscribe();
   };
 }

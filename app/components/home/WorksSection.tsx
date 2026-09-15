@@ -9,11 +9,13 @@ import {
 } from "~/content/site";
 import { initWorksBalloonIntro } from "~/lib/works-balloons.client";
 import { initWorksCarouselDrag } from "~/lib/works-carousel.client";
-import { initWorksMealsIntro } from "~/lib/works-meals.client";
 import { initWorksMemomeIntro } from "~/lib/works-memome.client";
+import {
+  initWorksMealsIntro,
+  initWorksWebrtcIntro,
+} from "~/lib/works-prop-pop.client";
 import { initWorksSquiggleLayout } from "~/lib/works-squiggle.client";
 import { initWorksStageMotion } from "~/lib/works-stage-motion.client";
-import { initWorksWebrtcIntro } from "~/lib/works-webrtc.client";
 import "./works-section.css";
 
 const SLIDE_COUNT = worksProjects.length;

@@ -3,6 +3,7 @@ import {
   getWorksHeadlineParallaxY,
   getWorksHeadlineRevealProgress,
 } from "~/lib/section-scroll-motion.client";
+import { getCheckedSlideIndex } from "~/lib/works-slide.client";
 
 const DESKTOP_LAYOUT = "(min-width: 48rem)";
 const ANNOTATIONS_LAYOUT = "(min-width: 48rem)";
@@ -19,14 +20,6 @@ function clamp(value: number, min: number, max: number) {
 
 function easeOutCubic(value: number) {
   return 1 - Math.pow(1 - value, 3);
-}
-
-function getCheckedSlideIndex() {
-  const checked = document.querySelector<HTMLInputElement>(
-    'input[name="works-slide"]:checked',
-  );
-  if (!checked) return 0;
-  return Number(checked.id.replace("works-slide-", ""));
 }
 
 function staggeredWriteProgress(reveal: number, index: number) {

@@ -126,14 +126,20 @@ export function ProjectHeroMedia({ hero }: ProjectHeroMediaProps) {
   }
 
   function handleVideoPointerUp(event: React.PointerEvent<HTMLVideoElement>) {
-    if (event.pointerType !== "mouse" || !isDesktopViewport()) return;
+    // Desktop mouse: paused opens the lightbox; playing pauses in place.
+    if (isDesktopViewport() && event.pointerType === "mouse") {
+      if (isPlaying) {
+        void togglePlayback();
+        return;
+      }
 
-    if (isPlaying) {
-      void togglePlayback();
+      openLightbox();
       return;
     }
 
-    openLightbox();
+    // Touch and sub-desktop: the play overlay hides while playing, so the
+    // video itself must toggle playback on tap.
+    void togglePlayback();
   }
 
   function handleVideoPause() {

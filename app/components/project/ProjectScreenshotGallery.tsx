@@ -12,6 +12,17 @@ type ProjectScreenshotGalleryProps = {
   roundFirstImage?: boolean;
 };
 
+const ROW_MODIFIER = {
+  full: "project-gallery__row--full",
+  triple: "project-gallery__row--triple",
+  "pair-wide-left": "project-gallery__row--pair-wide-left",
+  pair: "project-gallery__row--pair",
+} as const;
+
+function rowImages(row: ProjectScreenshotRow): readonly ProjectImage[] {
+  return row.type === "full" ? [row.image] : row.images;
+}
+
 function useTripleRowLastImageHeight(
   rowRef: RefObject<HTMLLIElement | null>,
   imageSourcesKey: string,
@@ -91,130 +102,79 @@ function useTripleRowLastImageHeight(
   }, [imageSourcesKey]);
 }
 
-function TripleScreenshotRow({
-  row,
-  revealedSrc,
-  onReveal,
-  onOpen,
-  roundFirstImage,
-}: {
-  row: Extract<ProjectScreenshotRow, { type: "triple" }>;
+type RowProps = {
+  row: ProjectScreenshotRow;
+  /** Flat position of this row's first image within the whole gallery. */
+  startIndex: number;
   revealedSrc: string | null;
   onReveal: (src: string) => void;
   onOpen: (image: ProjectImage, imageClassName: string) => void;
   roundFirstImage?: boolean;
-}) {
+};
+
+function imageClassFor(
+  row: ProjectScreenshotRow,
+  indexInRow: number,
+  flatIndex: number,
+  roundFirstImage?: boolean,
+) {
+  if (row.type === "triple" && indexInRow === 2) {
+    return "project-gallery__image project-gallery__image--triple-last";
+  }
+  if (roundFirstImage && flatIndex === 0) {
+    return "project-gallery__image project-gallery__image--rounded";
+  }
+  return "project-gallery__image";
+}
+
+function RowFigures({
+  row,
+  startIndex,
+  revealedSrc,
+  onReveal,
+  onOpen,
+  roundFirstImage,
+}: RowProps) {
+  return rowImages(row).map((image, indexInRow) => {
+    const flatIndex = startIndex + indexInRow;
+    const imageClassName = imageClassFor(row, indexInRow, flatIndex, roundFirstImage);
+
+    return (
+      <ExpandableImageTrigger
+        key={image.src}
+        image={image}
+        figureIndex={flatIndex}
+        isRevealed={revealedSrc === image.src}
+        onReveal={() => onReveal(image.src)}
+        onOpen={() => onOpen(image, imageClassName)}
+        imageClassName={imageClassName}
+      />
+    );
+  });
+}
+
+/** The last image is height-matched to its siblings, which needs a measured row. */
+function TripleScreenshotRow(props: RowProps) {
   const rowRef = useRef<HTMLLIElement>(null);
-  const imageSources = row.images.map((image) => image.src);
+  const imageSources = rowImages(props.row).map((image) => image.src);
 
   useTripleRowLastImageHeight(rowRef, imageSources.join("|"));
 
   return (
-    <li
-      ref={rowRef}
-      className="project-gallery__row project-gallery__row--triple"
-    >
-      {row.images.map((image, index) => {
-        const imageClassName =
-          index === 2
-            ? "project-gallery__image project-gallery__image--triple-last"
-            : index === 0 && roundFirstImage
-              ? "project-gallery__image project-gallery__image--rounded"
-              : "project-gallery__image";
-
-        return (
-          <ExpandableImageTrigger
-            key={image.src}
-            image={image}
-            isRevealed={revealedSrc === image.src}
-            onReveal={() => onReveal(image.src)}
-            onOpen={() => onOpen(image, imageClassName)}
-            imageClassName={imageClassName}
-          />
-        );
-      })}
+    <li ref={rowRef} className={`project-gallery__row ${ROW_MODIFIER.triple}`}>
+      <RowFigures {...props} />
     </li>
   );
 }
 
-function ScreenshotRow({
-  row,
-  revealedSrc,
-  onReveal,
-  onOpen,
-  roundFirstImage,
-}: {
-  row: ProjectScreenshotRow;
-  revealedSrc: string | null;
-  onReveal: (src: string) => void;
-  onOpen: (image: ProjectImage, imageClassName: string) => void;
-  roundFirstImage?: boolean;
-}) {
-  if (row.type === "full") {
-    const imageClassName = "project-gallery__image";
-
-    return (
-      <li className="project-gallery__row project-gallery__row--full">
-        <ExpandableImageTrigger
-          image={row.image}
-          isRevealed={revealedSrc === row.image.src}
-          onReveal={() => onReveal(row.image.src)}
-          onOpen={() => onOpen(row.image, imageClassName)}
-          imageClassName={imageClassName}
-        />
-      </li>
-    );
-  }
-
-  if (row.type === "triple") {
-    return (
-      <TripleScreenshotRow
-        row={row}
-        revealedSrc={revealedSrc}
-        onReveal={onReveal}
-        onOpen={onOpen}
-        roundFirstImage={roundFirstImage}
-      />
-    );
-  }
-
-  if (row.type === "pair-wide-left") {
-    return (
-      <li className="project-gallery__row project-gallery__row--pair-wide-left">
-        {row.images.map((image) => {
-          const imageClassName = "project-gallery__image";
-
-          return (
-            <ExpandableImageTrigger
-              key={image.src}
-              image={image}
-              isRevealed={revealedSrc === image.src}
-              onReveal={() => onReveal(image.src)}
-              onOpen={() => onOpen(image, imageClassName)}
-              imageClassName={imageClassName}
-            />
-          );
-        })}
-      </li>
-    );
+function ScreenshotRow(props: RowProps) {
+  if (props.row.type === "triple") {
+    return <TripleScreenshotRow {...props} />;
   }
 
   return (
-    <li className="project-gallery__row project-gallery__row--pair">
-      {row.images.map((image) => {
-        const imageClassName = "project-gallery__image";
-
-        return (
-          <ExpandableImageTrigger
-            key={image.src}
-            image={image}
-            isRevealed={revealedSrc === image.src}
-            onReveal={() => onReveal(image.src)}
-            onOpen={() => onOpen(image, imageClassName)}
-            imageClassName={imageClassName}
-          />
-        );
-      })}
+    <li className={`project-gallery__row ${ROW_MODIFIER[props.row.type]}`}>
+      <RowFigures {...props} />
     </li>
   );
 }
@@ -253,19 +213,27 @@ export function ProjectScreenshotGallery({
     setActiveImage(image);
   }
 
+  let startIndex = 0;
+
   return (
     <>
       <ul ref={galleryRef} className="project-gallery">
-        {rows.map((row, index) => (
-          <ScreenshotRow
-            key={`${row.type}-${index}`}
-            row={row}
-            revealedSrc={revealedSrc}
-            onReveal={setRevealedSrc}
-            onOpen={handleOpen}
-            roundFirstImage={roundFirstImage}
-          />
-        ))}
+        {rows.map((row, index) => {
+          const rowStartIndex = startIndex;
+          startIndex += rowImages(row).length;
+
+          return (
+            <ScreenshotRow
+              key={`${row.type}-${index}`}
+              row={row}
+              startIndex={rowStartIndex}
+              revealedSrc={revealedSrc}
+              onReveal={setRevealedSrc}
+              onOpen={handleOpen}
+              roundFirstImage={roundFirstImage}
+            />
+          );
+        })}
       </ul>
 
       {activeImage ? (

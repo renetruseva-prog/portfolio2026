@@ -51,6 +51,54 @@ function ProjectBackLink() {
   );
 }
 
+function ProjectSection({
+  headingId,
+  title,
+  modifier,
+  children,
+}: {
+  headingId: string;
+  title: string;
+  modifier?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className={modifier ? `project-section ${modifier}` : "project-section"}
+      aria-labelledby={headingId}
+    >
+      <h2 id={headingId} className="project-section__title display-title">
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
+function ProjectCopy({ paragraphs }: { paragraphs: readonly string[] }) {
+  return (
+    <div className="project-section__copy">
+      {paragraphs.map((paragraph) => (
+        <p key={paragraph} className="project-section__body">
+          {paragraph}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function ProjectBulletList({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="project-goals">
+      {items.map((item) => (
+        <li key={item} className="project-goals__item">
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function TagList({
   items,
   underlineFirst = false,
@@ -247,32 +295,20 @@ function CaseStudyPage({
 
             <div className="project-page__panel project-page__panel--details">
               <div className="project-page__panel-main">
-                <section
-                  className="project-section project-section--field"
-                  aria-labelledby="project-field-heading"
+                <ProjectSection
+                  headingId="project-field-heading"
+                  title="Field"
+                  modifier="project-section--field"
                 >
-                  <h2
-                    id="project-field-heading"
-                    className="project-section__title display-title"
-                  >
-                    Field
-                  </h2>
                   <div className="project-section__tags-wrap">
                     <TagList items={project.tags} underlineFirst />
                   </div>
-                </section>
+                </ProjectSection>
 
-                <section
-                  className="project-section"
-                  aria-labelledby="project-toolkit-heading"
+                <ProjectSection
+                  headingId="project-toolkit-heading"
+                  title="Toolkit"
                 >
-                  <h2
-                    id="project-toolkit-heading"
-                    className="project-section__title display-title"
-                  >
-                    Toolkit
-                  </h2>
-
                   <div className="project-toolkit">
                     {caseStudy.toolkit.map((group) => (
                       <div key={group.label} className="project-toolkit__group">
@@ -291,26 +327,15 @@ function CaseStudyPage({
                       </div>
                     ))}
                   </div>
-                </section>
+                </ProjectSection>
 
                 {caseStudy.processIntro ? (
-                  <section
-                    className="project-section project-section--process-intro"
-                    aria-labelledby="project-process-intro-heading"
+                  <ProjectSection
+                    headingId="project-process-intro-heading"
+                    title="Process"
+                    modifier="project-section--process-intro"
                   >
-                    <h2
-                      id="project-process-intro-heading"
-                      className="project-section__title display-title"
-                    >
-                      Process
-                    </h2>
-                    <div className="project-section__copy">
-                      {caseStudy.processIntro.paragraphs.map((paragraph) => (
-                        <p key={paragraph} className="project-section__body">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
+                    <ProjectCopy paragraphs={caseStudy.processIntro.paragraphs} />
                     {caseStudy.processIntro.link ? (
                       <ProjectLinkButton
                         href={caseStudy.processIntro.link.href}
@@ -318,23 +343,17 @@ function CaseStudyPage({
                         variant="cream"
                       />
                     ) : null}
-                  </section>
+                  </ProjectSection>
                 ) : null}
               </div>
 
               <div className="project-page__panel-aside">
-                <section
-                  className="project-section"
-                  aria-labelledby="project-screenshots-heading"
+                <ProjectSection
+                  headingId="project-screenshots-heading"
+                  title="Screenshots"
                 >
-                  <h2
-                    id="project-screenshots-heading"
-                    className="project-section__title display-title"
-                  >
-                    Screenshots
-                  </h2>
                   <ProjectScreenshotGallery rows={caseStudy.screenshotRows} />
-                </section>
+                </ProjectSection>
               </div>
             </div>
 
@@ -351,25 +370,13 @@ function CaseStudyPage({
             >
               <div className="project-page__panel-main">
                 {caseStudy.descriptionSection ? (
-                  <section
-                    className="project-section"
-                    aria-labelledby="project-description-section-heading"
+                  <ProjectSection
+                    headingId="project-description-section-heading"
+                    title={caseStudy.descriptionSection.title}
                   >
-                    <h2
-                      id="project-description-section-heading"
-                      className="project-section__title display-title"
-                    >
-                      {caseStudy.descriptionSection.title}
-                    </h2>
-                    <div className="project-section__copy">
-                      {caseStudy.descriptionSection.paragraphs.map(
-                        (paragraph) => (
-                          <p key={paragraph} className="project-section__body">
-                            {paragraph}
-                          </p>
-                        ),
-                      )}
-                    </div>
+                    <ProjectCopy
+                      paragraphs={caseStudy.descriptionSection.paragraphs}
+                    />
                     {caseStudy.descriptionSection.links ? (
                       <ProjectLinkActions
                         links={caseStudy.descriptionSection.links}
@@ -381,106 +388,49 @@ function CaseStudyPage({
                         rows={caseStudy.descriptionSection.screenshotRows}
                       />
                     ) : null}
-                  </section>
+                  </ProjectSection>
                 ) : null}
 
                 {caseStudy.description ? (
-                  <section
-                    className="project-section"
-                    aria-labelledby="project-description-heading"
+                  <ProjectSection
+                    headingId="project-description-heading"
+                    title="Description"
                   >
-                    <h2
-                      id="project-description-heading"
-                      className="project-section__title display-title"
-                    >
-                      Description
-                    </h2>
-                    <div className="project-section__copy">
-                      {caseStudy.description.map((paragraph) => (
-                        <p key={paragraph} className="project-section__body">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </section>
+                    <ProjectCopy paragraphs={caseStudy.description} />
+                  </ProjectSection>
                 ) : null}
 
                 {caseStudy.role ? (
-                  <section
-                    className="project-section"
-                    aria-labelledby="project-role-heading"
+                  <ProjectSection
+                    headingId="project-role-heading"
+                    title="My role"
                   >
-                    <h2
-                      id="project-role-heading"
-                      className="project-section__title display-title"
-                    >
-                      My role
-                    </h2>
-                    <ul className="project-goals">
-                      {caseStudy.role.map((item) => (
-                        <li key={item} className="project-goals__item">
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
+                    <ProjectBulletList items={caseStudy.role} />
+                  </ProjectSection>
                 ) : null}
 
                 {caseStudy.goals ? (
-                  <section
-                    className="project-section"
-                    aria-labelledby="project-goal-heading"
-                  >
-                    <h2
-                      id="project-goal-heading"
-                      className="project-section__title display-title"
-                    >
-                      Goal
-                    </h2>
-                    <ul className="project-goals">
-                      {caseStudy.goals.map((goal) => (
-                        <li key={goal} className="project-goals__item">
-                          {goal}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
+                  <ProjectSection headingId="project-goal-heading" title="Goal">
+                    <ProjectBulletList items={caseStudy.goals} />
+                  </ProjectSection>
                 ) : null}
 
                 {caseStudy.features ? (
-                  <section
-                    className="project-section"
-                    aria-labelledby="project-features-heading"
+                  <ProjectSection
+                    headingId="project-features-heading"
+                    title="Features"
                   >
-                    <h2
-                      id="project-features-heading"
-                      className="project-section__title display-title"
-                    >
-                      Features
-                    </h2>
-                    <ul className="project-goals">
-                      {caseStudy.features.map((feature) => (
-                        <li key={feature} className="project-goals__item">
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
+                    <ProjectBulletList items={caseStudy.features} />
+                  </ProjectSection>
                 ) : null}
               </div>
 
               {caseStudy.process ? (
                 <div className="project-page__panel-aside">
-                  <section
-                    className="project-section"
-                    aria-labelledby="project-process-heading"
+                  <ProjectSection
+                    headingId="project-process-heading"
+                    title="Process"
                   >
-                    <h2
-                      id="project-process-heading"
-                      className="project-section__title display-title"
-                    >
-                      Process
-                    </h2>
                     <p className="project-process__step">
                       {caseStudy.process.step}
                     </p>
@@ -489,7 +439,7 @@ function CaseStudyPage({
                       figureClassName="project-process__figure project-gallery__figure"
                       imageClassName="project-process__image project-gallery__image"
                     />
-                  </section>
+                  </ProjectSection>
                 </div>
               ) : null}
 

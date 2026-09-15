@@ -116,6 +116,8 @@ type ExpandableImageTriggerProps = {
   figureRef?: RefObject<HTMLElement | null>;
   figureClassName?: string;
   imageClassName?: string;
+  /** Flat position in the gallery, so layout CSS can target a figure directly. */
+  figureIndex?: number;
 };
 
 export function ExpandableImageTrigger({
@@ -126,9 +128,10 @@ export function ExpandableImageTrigger({
   figureRef,
   figureClassName = "project-gallery__figure",
   imageClassName = "project-gallery__image",
+  figureIndex,
 }: ExpandableImageTriggerProps) {
   return (
-    <figure ref={figureRef} className={figureClassName}>
+    <figure ref={figureRef} className={figureClassName} data-fig={figureIndex}>
       <button
         type="button"
         className={`project-gallery__trigger${isRevealed ? " is-revealed" : ""}`}

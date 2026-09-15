@@ -2,6 +2,7 @@ import type { gsap as GsapCore } from "gsap";
 import type DraggablePlugin from "gsap/Draggable";
 
 import { worksSlideCircleColors } from "~/content/site";
+import { getCheckedSlideIndex } from "~/lib/works-slide.client";
 
 type GsapInstance = typeof GsapCore;
 type DraggableInstance = typeof DraggablePlugin;
@@ -173,14 +174,6 @@ function prevIndex(index: number) {
 function nextIndex(index: number) {
   const count = getSlideCount();
   return (index + 1) % count;
-}
-
-function getCheckedSlideIndex() {
-  const checked = document.querySelector<HTMLInputElement>(
-    'input[name="works-slide"]:checked',
-  );
-  if (!checked) return 0;
-  return Number(checked.id.replace("works-slide-", ""));
 }
 
 function goToSlide(index: number) {

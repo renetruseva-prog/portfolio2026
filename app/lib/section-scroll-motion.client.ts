@@ -1,3 +1,6 @@
+/** Only the top edge is ever read, so a plain rect source is enough to test against. */
+type RectSource = { getBoundingClientRect(): { top: number } };
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -6,7 +9,7 @@ function easeOutCubic(value: number) {
   return 1 - Math.pow(1 - value, 3);
 }
 
-function getDecorativeLineRevealProgressFromY(
+export function getDecorativeLineRevealProgressFromY(
   anchorY: number,
   viewportHeight: number,
   startRatio = 1.06,
@@ -132,8 +135,8 @@ export function getWorksHeadlineParallaxY(
   return (1 - reveal) * viewportHeight * 0.085;
 }
 
-function getRevealProgress(
-  element: HTMLElement,
+export function getRevealProgress(
+  element: RectSource,
   viewportHeight: number,
   startRatio = 0.88,
   endRatio = 0.62,
@@ -170,27 +173,23 @@ export function bindScrollMotion(
 
   update();
 
-  document.addEventListener("scroll", scheduleUpdate, { passive: true, capture: true });
-  document.addEventListener("touchmove", scheduleUpdate, { passive: true, capture: true });
+  // Capture on window sees scroll from any target, including nested scrollers,
+  // which don't bubble. touchmove and visualViewport cover iOS, where scroll can
+  // stall mid-drag and the URL bar resizes the visual viewport without a resize.
   window.addEventListener("scroll", scheduleUpdate, { passive: true, capture: true });
+  window.addEventListener("touchmove", scheduleUpdate, { passive: true, capture: true });
   window.addEventListener("resize", scheduleUpdate, { passive: true });
   window.addEventListener("orientationchange", scheduleUpdate, { passive: true });
-  document.documentElement.addEventListener("scroll", scheduleUpdate, {
-    passive: true,
-    capture: true,
-  });
   window.visualViewport?.addEventListener("scroll", scheduleUpdate, { passive: true });
   window.visualViewport?.addEventListener("resize", scheduleUpdate, { passive: true });
 
   return () => {
     disposed = true;
     cancelAnimationFrame(rafId);
-    document.removeEventListener("scroll", scheduleUpdate, true);
-    document.removeEventListener("touchmove", scheduleUpdate, true);
     window.removeEventListener("scroll", scheduleUpdate, true);
+    window.removeEventListener("touchmove", scheduleUpdate, true);
     window.removeEventListener("resize", scheduleUpdate);
     window.removeEventListener("orientationchange", scheduleUpdate);
-    document.documentElement.removeEventListener("scroll", scheduleUpdate, true);
     window.visualViewport?.removeEventListener("scroll", scheduleUpdate);
     window.visualViewport?.removeEventListener("resize", scheduleUpdate);
   };
@@ -254,7 +253,11 @@ function getEducationTimelineProgress(
   );
 }
 
-function getMarkerProgress(timelineProgress: number, index: number, total: number) {
+export function getMarkerProgress(
+  timelineProgress: number,
+  index: number,
+  total: number,
+) {
   if (total <= 1) {
     return timelineProgress;
   }
