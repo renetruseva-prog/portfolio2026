@@ -180,8 +180,6 @@ export function AboutSection() {
           href={site.cv.href}
           className="about__cta"
           download
-          target="_blank"
-          rel="noopener noreferrer"
         >
           {site.cv.label}
           <img

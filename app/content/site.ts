@@ -23,7 +23,7 @@ export const site = {
   },
   cv: {
     label: "Download my CV",
-    href: "/cv/renet-ruseva-cv.pdf",
+    href: "/CV/CV_RenetRuseva.pdf",
   },
 } as const;
 
@@ -254,7 +254,7 @@ export const footerContent = {
     { label: "Github", href: "https://github.com/renetruseva-prog" },
     { label: "Behance", href: "https://www.behance.net/renetruseva" },
     { label: "Email", href: "mailto:renetruseva@gmail.com" },
-    { label: "Download CV", href: "/cv/renet-ruseva-cv.pdf" },
+    { label: "Download CV", href: site.cv.href },
   ],
   backToTop: "Back to top",
   copyright: "© Copyright Renet Ruseva 2026",
